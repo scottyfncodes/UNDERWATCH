@@ -108,6 +108,9 @@ class Game {
   private planOpenClass = false;
   /** Seconds to the next spark off the trucks while a grind holds. */
   private sparkIn = 0;
+  /** Job points already marked in the street, for the run they belong to. */
+  private pinged = new Set<string>();
+  private pingedRun: unknown = null;
   /** Which day it is in the player's calendar, and so which conditions the board has today. */
   private readonly day = (() => { const d = new Date(); return dayIndex(d.getFullYear(), d.getMonth(), d.getDate()); })();
   private readonly condition: Condition = conditionFor(this.day);
@@ -515,7 +518,14 @@ class Game {
   private stepJob(dt: number): void {
     const r = this.run;
     if (!r) return;
+    if (this.pingedRun !== r) { this.pingedRun = r; this.pinged.clear(); }
+    const before = r.done.size;
+    const stage = r.stage;
     r.step(dt);
+    // A point on the list done: the street says so where it happened.
+    if (stage && r.done.size > before) {
+      for (const pt of stage.points) if (r.done.has(pt.id) && !this.pinged.has(pt.id)) { this.pinged.add(pt.id); this.renderer.objective(pt.pos); }
+    }
     for (const c of r.takeCallouts()) {
       this.jobHud.say(c);
       if (c.tone === 'alarm') this.audio.motif(0.7);
@@ -1021,6 +1031,7 @@ class Game {
       this.audio.bail();
       this.renderer.kick(0.5);
       this.renderer.ripple(pos, 0.6);
+      this.renderer.scuff(pos);
     });
     // The false positive, where it happened: on Devon, and in the frame.
     bus.on('match:false-positive', ({ identity, confidence }) => {
@@ -1125,8 +1136,8 @@ class Game {
     bus.on('talk:open', () => this.audio.talkBlip());
     bus.on('talk:advance', () => this.audio.talkBlip());
     // Caught it: a sound, and nothing written on the screen about it.
-    bus.on('player:trick', () => this.audio.land(0.6));
-    bus.on('player:grab', () => this.audio.land(0.6));
+    bus.on('player:trick', () => { this.audio.land(0.6); this.renderer.caught(); });
+    bus.on('player:grab', () => { this.audio.land(0.6); this.renderer.caught(); });
     bus.on('talk:open', ({ kind, id }) => {
       (kind === 'person' ? this.metPeople : this.seenPlaces).add(id);
     });
@@ -1489,6 +1500,7 @@ class Game {
         this.renderer.burst('spark', this.sim.player.pos, grind.line.z, 2, this.sim.player.heading, 0.7 + Math.min(0.6, this.sim.player.speed / 14));
       }
     } else this.sparkIn = 0;
+    this.renderer.watchTone = this.hud.frame.watching;
     this.renderer.render(dt);
     // In a job the exposure meter is the system's own account of you; the
     // frame's corners say the same thing the strip at the top does.

@@ -7,7 +7,7 @@ to stay free of it is to become something it cannot predict.
 ```
 npm install
 npm run dev      # http://localhost:5173
-npm test         # 709 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
+npm test         # 718 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
 npm run build
 npm run test:e2e # browser checks: visual, accessibility (axe) and in-run layout
 ```
