@@ -734,7 +734,10 @@ class Game {
     const p = this.sim.player.pos;
     this.renderer.cam.scripted = {
       pos: { x: p.x, y: p.y }, zoom: 12,
-      close: this.touchPrimary || window.innerWidth < window.innerHeight
+      // Upright glass gets the portrait; anything wider than tall, a phone on
+      // its side included, gets the wide shot — the portrait on a 393 px-tall
+      // screen cut the kid off at the neck.
+      close: window.innerWidth < window.innerHeight
         ? { dist: 9.5, height: 3.6, lead: 3.4 }
         : { dist: 16, height: 4.4, lead: 1.2 },
       still: this.settings.reduceMotion,
