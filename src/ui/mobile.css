@@ -254,3 +254,84 @@ html.touch #inspect .verb.node { background: rgba(242, 245, 247, 0.07); }
   }
   #talk.show { transform: none; }
 }
+
+/*
+ * The top band, during play on a phone.
+ *
+ * Three things want the top of the glass at once: the job strip, the town's
+ * cards and the notes' toasts — and on the plan, the plan's own readout. They
+ * used to be placed by fixed offsets that each assumed the others were small,
+ * and in the first three seconds of a job two system cards landed on the
+ * street ahead and on the destination's own label. The rule now: the band is
+ * the strip plus the corner buttons, and everything else starts under the
+ * band's measured edge. One system card at a time during a job — the strip
+ * already says how seen you are; the card is texture on top of that.
+ */
+@media (max-width: 820px), (pointer: coarse) {
+  html.jobs-mode #ui.touch-hud #notifications,
+  html.jobs-mode #toasts {
+    top: max(calc(62px + var(--safe-top)), calc(var(--band-bottom, 0px) + 8px));
+  }
+  html.jobs-mode .note:nth-child(n + 2) { display: none; }
+
+  /* The plan is a stop to look. Its readout sits where the cards would, and
+     the cards are the town talking over it — so they step back while it is
+     open, and a toast gets the full width so it stays one short line. */
+  html.plan-open #notifications { opacity: 0; visibility: hidden; transition: opacity 200ms var(--ease), visibility 0s 200ms; }
+  html.plan-open #toasts { max-width: calc(100vw - 20px - var(--safe-left) - var(--safe-right)); }
+  html.plan-open .toast { flex-direction: row; align-items: baseline; gap: 8px; }
+}
+
+/*
+ * A phone on its side has height to spare nowhere and width to spare
+ * everywhere, so the band becomes one row: Jobs and the strip on the left,
+ * the town's card beside pause on the right, and the middle of the top edge
+ * left to the street — it is where the destination's own label rises. The
+ * card no longer drops down the right edge into PLAN and SLING.
+ */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  #job-hud {
+    right: auto;
+    width: max-content;
+    max-width: min(420px, calc(50vw - 84px - var(--safe-left)));
+  }
+  #ui.touch-hud #notifications,
+  html.jobs-mode #ui.touch-hud #notifications {
+    top: calc(10px + var(--safe-top));
+    right: calc(10px + 44px + 8px + var(--safe-right));
+    width: min(calc(50vw - 70px), calc(240px * var(--text-scale)));
+  }
+  .note:nth-child(n + 2) { display: none; }
+  html.jobs-mode #toasts { top: calc(var(--band-bottom, 54px) + 8px); }
+}
+
+/*
+ * The title on a phone on its side. The column of choices was sized for an
+ * upright phone, and on its side RIDE became a bar across half the glass with
+ * the kid squeezed behind it. Here the words keep to a narrow column on the
+ * left, at the size a thumb needs and no bigger, and the kid has the middle.
+ */
+@media (orientation: landscape) and (max-height: 520px) {
+  #title { padding: calc(14px + var(--safe-top)) calc(22px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(26px + var(--safe-left)); }
+  #title .st-title { font-size: 26px; gap: 9px; }
+  #title .t-sys { top: calc(14px + var(--safe-top) + 26px + 22px); left: calc(26px + var(--safe-left)); }
+  #title .t-foot { width: min(300px, 40vw); gap: 8px; }
+  #title .t-premise { font-size: 16px; margin-bottom: 4px; }
+  #title .t-ride { min-height: 58px; font-size: 20px; padding: 8px 16px; }
+  #title .t-ride small, #title .t-quiet small { margin-top: 2px; font-size: 11px; }
+  #title .t-quiet { min-height: 46px; padding: 6px 16px; font-size: 11.5px; }
+  #title .t-row { min-height: 30px; }
+  #title .t-access em { display: none; }
+  #title .t-sheet { left: calc(26px + var(--safe-left)); right: auto; bottom: calc(14px + var(--safe-bottom)); width: min(340px, 46vw); max-height: calc(100% - 28px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto; }
+  #title .t-sheet .setting { min-height: 44px; }
+}
+
+/* In a job, on a phone, the town's card is a one-line ticker: the rule down
+   the left still says how much it matters, and it stays short enough to sit
+   above the street's own labels even on a small phone. */
+@media (max-width: 820px), (pointer: coarse) {
+  html.jobs-mode .note { padding: 6px 9px 6px; }
+  html.jobs-mode .note .brand { display: none; }
+  html.jobs-mode .note .line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html.jobs-mode .note .line + .line { display: none; }
+}

@@ -4,8 +4,8 @@ import { buildBellhaven } from '../src/content/bellhaven';
 import { markersFor, sightlinesFor, SIGHTLINE_MAX } from '../src/render/evidence';
 import { ADULT, DEVON, RIDER, castLook, officerLook, pose, residentLook, wearable, type Look } from '../src/render/characters';
 import { INK, Ink, brushOutline } from '../src/render/ink';
-import { MACHINE, PRINT, SIGNAL, SKY, TECH, VENEER, weather } from '../src/render/palette';
-import { MATERIAL, streetDressingFor, terminalFor } from '../src/render/perspective';
+import { LIGHT, MACHINE, PRINT, SIGNAL, SKY, TECH, VENEER, weather } from '../src/render/palette';
+import { LOT_FLOODS, MATERIAL, streetDressingFor, terminalFor } from '../src/render/perspective';
 import type { Vec2 } from '../src/core/math';
 
 /*
@@ -44,6 +44,8 @@ const hueGap = (a: number, b: number) => { const d = Math.abs(a - b) % 360; retu
 const ENVIRONMENT: Array<[string, string]> = [
   ...Object.entries(PRINT).filter(([, v]) => typeof v === 'string').map(([k, v]) => [`PRINT.${k}`, v] as [string, string]),
   ...Object.entries(SKY).map(([k, v]) => [`SKY.${k}`, v] as [string, string]),
+  // The evening the street is seen in (docs/51) obeys the street's rules.
+  ...Object.entries(LIGHT).map(([k, v]) => [`LIGHT.${k}`, v] as [string, string]),
   ...Object.entries(MATERIAL).flatMap(([k, vs]) => (vs ?? []).map((v, i) => [`MATERIAL.${k}[${i}]`, v] as [string, string])),
 ];
 
@@ -342,6 +344,17 @@ describe('the dressing stays out of the way', () => {
     for (const t of standing()) {
       for (const b of world.buildings) expect({ ...t, b: b.id, inside: inside(t.at, b.poly) }).toEqual({ ...t, b: b.id, inside: false });
       for (const f of world.features) expect({ ...t, f: f.id, inside: inside(t.at, f.poly) }).toEqual({ ...t, f: f.id, inside: false });
+    }
+  });
+
+  it('stands the Lot\'s floodlights on bare ground: off every surface, building and feature (docs/51)', () => {
+    for (const fl of LOT_FLOODS) {
+      const on = world.surfaces.filter((s) => inside(fl.at, s.poly)).map((s) => s.id);
+      expect({ at: fl.at, on }).toEqual({ at: fl.at, on: [] });
+      for (const b of world.buildings) expect(inside(fl.at, b.poly)).toBe(false);
+      for (const f of world.features) expect(inside(fl.at, f.poly)).toBe(false);
+      // And each throws its light in across the pad, not out into the field.
+      expect(world.surfaces.some((s) => inside(fl.aim, s.poly))).toBe(true);
     }
   });
 

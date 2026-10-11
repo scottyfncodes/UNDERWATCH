@@ -104,6 +104,10 @@ class Game {
   private run: JobRun | null = null;
   /** Whether something has the rider in a job, as last written to the document. */
   private hudBusy = false;
+  /** Mirrors the plan view onto the document, so the HUD can make room for it. */
+  private planOpenClass = false;
+  /** Seconds to the next spark off the trucks while a grind holds. */
+  private sparkIn = 0;
   /** Which day it is in the player's calendar, and so which conditions the board has today. */
   private readonly day = (() => { const d = new Date(); return dayIndex(d.getFullYear(), d.getMonth(), d.getDate()); })();
   private readonly condition: Condition = conditionFor(this.day);
@@ -732,7 +736,10 @@ class Game {
     const p = this.sim.player.pos;
     this.renderer.cam.scripted = {
       pos: { x: p.x, y: p.y }, zoom: 12,
-      close: this.touchPrimary || window.innerWidth < window.innerHeight
+      // Upright glass gets the portrait; anything wider than tall, a phone on
+      // its side included, gets the wide shot — the portrait on a 393 px-tall
+      // screen cut the kid off at the neck.
+      close: window.innerWidth < window.innerHeight
         ? { dist: 9.5, height: 3.6, lead: 3.4 }
         : { dist: 16, height: 4.4, lead: 1.2 },
       still: this.settings.reduceMotion,
@@ -997,13 +1004,18 @@ class Game {
     });
     bus.on('world:glass', ({ pos }) => { this.audio.impact('glass', 1, 1); this.renderer.burst('chip', pos, 1.5, 10, 0, 1.1); });
     // Grinds: the trucks biting the rail, and letting go of it.
-    bus.on('player:grind', () => { this.audio.land(0.55); this.audio.impact('metal', 0.5, 1); this.renderer.kick(0.07); });
+    bus.on('player:grind', ({ pos }) => {
+      this.audio.land(0.55); this.audio.impact('metal', 0.5, 1); this.renderer.kick(0.07);
+      this.renderer.impact(pos, 0.35);
+      this.renderer.burst('spark', pos, this.sim.grind?.line.z ?? 0.5, 8, this.sim.player.heading, 1.1);
+    });
     bus.on('player:grindEnd', () => this.audio.pop());
     bus.on('player:roof', ({ pos }) => this.renderer.ripple(pos, 0.5));
     bus.on('player:slide', ({ speed }) => this.audio.slide(Math.min(1, speed / 12)));
     bus.on('player:land', ({ speed }) => {
       this.audio.land(Math.min(1, speed / 12));
       this.renderer.kick(0.06 + Math.min(0.1, speed / 120));
+      this.renderer.impact(this.sim.player.pos, Math.min(1, speed / 11));
     });
     bus.on('player:bail', ({ pos }) => {
       this.audio.bail();
@@ -1463,6 +1475,20 @@ class Game {
     this.renderer.chase.focus = e
       ? (e.kind === 'person' ? (e.id === 'devon' ? this.sim.devonPos : this.sim.person(e.id)?.pos ?? e.pos) : e.pos)
       : null;
+    // What the HUD holds along the top edge, so the world's labels clamp under
+    // it: the job strip in a job, and on a phone the corner buttons (44 px
+    // from 10 px down) in any mode.
+    const corner = this.touchPrimary ? this.renderer.safe.top + 54 : 0;
+    this.renderer.hudTop = Math.max(corner, this.run && this.mode === 'jobs' ? this.jobHud.bottom : 0);
+    // Sparks off the trucks for as long as a grind holds (docs/51).
+    const grind = this.sim.grind;
+    if (grind && this.phase === 'play' && this.sim.player.speed > 1.5) {
+      this.sparkIn -= dt;
+      if (this.sparkIn <= 0) {
+        this.sparkIn = 0.06;
+        this.renderer.burst('spark', this.sim.player.pos, grind.line.z, 2, this.sim.player.heading, 0.7 + Math.min(0.6, this.sim.player.speed / 14));
+      }
+    } else this.sparkIn = 0;
     this.renderer.render(dt);
     // In a job the exposure meter is the system's own account of you; the
     // frame's corners say the same thing the strip at the top does.
@@ -1470,6 +1496,8 @@ class Game {
     this.hud.setWatchOverride(level);
     const busy = !!level && level !== 'UNSEEN';
     if (busy !== this.hudBusy) { this.hudBusy = busy; document.documentElement.classList.toggle('hud-busy', busy); }
+    const planOpen = this.phase === 'play' && this.sim.planViewActive;
+    if (planOpen !== this.planOpenClass) { this.planOpenClass = planOpen; document.documentElement.classList.toggle('plan-open', planOpen); }
     this.hud.update(dt);
     this.troubleHud.update(this.mode === 'jobs' ? this.trouble : null);
     if (this.run && this.mode === 'jobs') {

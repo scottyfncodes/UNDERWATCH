@@ -30,7 +30,7 @@ import { markersFor, sightlinesFor } from './evidence';
 import { DEVON, DOG_COATS, RIDER, castLook, dogCollar, officerLook, paintDog, paintFigure, pose, residentLook, type Gait, type Gesture, type Joints, type Look } from './characters';
 import { TUNE as SKATE, type PlayerState } from '../sim/player';
 import { INK, Ink, brushOutline, hash01, inkAt, seedOf } from './ink';
-import { CITY_INK, PRINT, SIGNAL, TECH, VENEER, alpha, mix, shade, weather } from './palette';
+import { CITY_INK, LIGHT, PRINT, SIGNAL, SKY, TECH, VENEER, alpha, mix, shade, weather } from './palette';
 import { Tone, tone } from './tone';
 import { POLE_H, poleLineFor } from '../sim/traversal/poleLine';
 
@@ -663,8 +663,15 @@ export class PerspectiveRenderer {
   private xs: number[] = [];
   private ys: number[] = [];
 
+  /** Where the rider is on the glass this frame: the centre of the light. */
+  private focus: { x: number; y: number } | null = null;
+  /** The lamps near enough to light the street this frame. */
+  private lamps: Lamp[] = [];
+
   draw(ctx: CanvasRenderingContext2D, sim: Sim, state: CamState, w: number, h: number, firstPerson: boolean): void {
     const cam = this.cam(state, w, h);
+    this.focus = firstPerson ? null : this.screenOf(state, sim.player.pos, 1.1 + sim.player.z, w, h);
+    this.lamps.length = 0;
     this.page = pageFor(this.mood);
     this.drawSkyAndGround(ctx, cam);
     this.faces.length = 0;
@@ -850,12 +857,106 @@ export class PerspectiveRenderer {
      * It also sits under the thumbs, where a darker ground reads better
      * against the controls drawn on it.
      */
-    const v0 = cam.h * 0.68;
-    const v = ctx.createLinearGradient(0, v0, 0, cam.h);
-    v.addColorStop(0, alpha(PRINT.ink, 0));
-    v.addColorStop(1, alpha(PRINT.ink, 0.38 + pg.owned * 0.3 - pg.lit * 0.16));
-    ctx.fillStyle = v;
-    ctx.fillRect(0, v0, cam.w, cam.h - v0);
+    // Last light (docs/51) takes the whole ground down from the horizon, not
+    // just the near third: one source-over pass, cheaper than a blend.
+    const v0 = Math.max(0, horizon);
+    if (v0 < cam.h) {
+      const v = ctx.createLinearGradient(0, v0, 0, cam.h);
+      const lift = pg.lit * 0.12;
+      v.addColorStop(0, alpha(LIGHT.near, 0));
+      v.addColorStop(0.35, alpha(LIGHT.near, Math.max(0, 0.16 - lift)));
+      v.addColorStop(1, alpha(PRINT.ink, Math.max(0.1, 0.42 + pg.owned * 0.25 - lift * 1.5)));
+      ctx.fillStyle = v;
+      ctx.fillRect(0, v0, cam.w, cam.h - v0);
+    }
+    this.drawLight(ctx, cam);
+  }
+
+  /**
+   * Last light (docs/51): the evening the street is seen in.
+   *
+   * A multiply pass, so the print keeps its structure — ink stays ink,
+   * paper goes down with the washes on it — and nothing is tinted a colour
+   * it was not printed in. (The ground's fall from the horizon's light to
+   * the slate under the thumbs is the source-over pass before it.) The
+   * whole street falls off toward the edges of the glass, except in a soft
+   * pool round the rider, so the
+   * kid holds full value and is the first thing the eye finds. A lit town
+   * opens the pool wide; an owned one closes it in.
+   */
+  private drawLight(ctx: CanvasRenderingContext2D, cam: Cam): void {
+    const pg = this.page;
+    const w = cam.w, h = cam.h;
+    const open = 1 + pg.lit * 0.5 - pg.owned * 0.2;
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    const f = this.focus;
+    const cx = f && f.x > -w && f.x < w * 2 ? f.x : w / 2;
+    const cy = f && f.y > -h && f.y < h * 2 ? f.y : h * 0.6;
+    const r = Math.max(w, h) * 0.75 * open;
+    const pool = ctx.createRadialGradient(cx, cy, Math.min(w, h) * 0.08 * open, cx, cy, r);
+    pool.addColorStop(0, '#FFFFFF');
+    pool.addColorStop(0.3, mix('#FFFFFF', LIGHT.edge, 0.3));
+    pool.addColorStop(0.7, mix('#FFFFFF', LIGHT.edge, 0.8));
+    pool.addColorStop(1, LIGHT.edge);
+    ctx.fillStyle = pool;
+    ctx.fillRect(0, 0, w, h);
+    this.drawLamps(ctx, cam, open);
+    ctx.restore();
+  }
+
+  /**
+   * The street lamps' light, laid on after the grade with a screen blend,
+   * so it lifts what it falls on. A pool on the ground under each housing,
+   * squashed by the ground's own perspective, and a small bloom at the
+   * housing. Paper-white, never lamp-yellow: amber is the player's.
+   */
+  private drawLamps(ctx: CanvasRenderingContext2D, cam: Cam, open: number): void {
+    if (this.lamps.length === 0) return;
+    // The eight nearest: past that a pool is a few pixels of horizon.
+    if (this.lamps.length > 8) {
+      const d = (l: Lamp) => (l.pool.x - cam.pos.x) ** 2 + (l.pool.y - cam.pos.y) ** 2;
+      this.lamps.sort((a, b) => d(a) - d(b));
+      this.lamps.length = 8;
+    }
+    const k = Math.max(0.35, 1 - this.page.lit * 0.6) / Math.max(0.8, open * 0.9);
+    ctx.globalCompositeOperation = 'screen';
+    for (const lamp of this.lamps) {
+      const at = lamp.pool;
+      const c = toCamera(cam, at.x, at.y, 0);
+      if (c.z <= NEAR + 0.5) continue;
+      const q = project(cam, c);
+      const R = lamp.r;
+      const ex = project(cam, toCamera(cam, at.x + Math.cos(cam.yaw + Math.PI / 2) * R, at.y + Math.sin(cam.yaw + Math.PI / 2) * R, 0));
+      const ey = toCamera(cam, at.x + Math.cos(cam.yaw) * R, at.y + Math.sin(cam.yaw) * R, 0);
+      const rx = Math.hypot(ex.x - q.x, ex.y - q.y);
+      const ry = ey.z > NEAR ? Math.max(rx * 0.12, Math.abs(project(cam, ey).y - q.y)) : rx * 0.4;
+      if (rx < 2 || q.x + rx < 0 || q.x - rx > cam.w || q.y + ry < 0 || q.y - ry > cam.h) continue;
+      ctx.save();
+      ctx.translate(q.x, q.y);
+      ctx.scale(1, ry / rx);
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+      // A wide flood is thinner per square metre than a lamp over a kerb.
+      const kk = k * (lamp.r > 12 ? 0.7 : 1);
+      g.addColorStop(0, alpha(LIGHT.lamp, 0.42 * kk));
+      g.addColorStop(0.35, alpha(LIGHT.lamp, 0.24 * kk));
+      g.addColorStop(0.7, alpha(LIGHT.lamp, 0.07 * kk));
+      g.addColorStop(1, alpha(LIGHT.lamp, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0, 0, rx, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      const hc = toCamera(cam, lamp.head.x, lamp.head.y, lamp.z);
+      if (hc.z > NEAR + 0.5) {
+        const hq = project(cam, hc);
+        const hr = Math.max(3, Math.min(26, (cam.f / hc.z) * 0.9));
+        const b = ctx.createRadialGradient(hq.x, hq.y, 0, hq.x, hq.y, hr);
+        b.addColorStop(0, alpha('#FFFFFF', 0.85 * k));
+        b.addColorStop(0.3, alpha(LIGHT.lamp, 0.4 * k));
+        b.addColorStop(1, alpha(LIGHT.lamp, 0));
+        ctx.fillStyle = b;
+        ctx.beginPath(); ctx.arc(hq.x, hq.y, hr, 0, Math.PI * 2); ctx.fill();
+      }
+    }
   }
 
   private drawSkyAndGround(ctx: CanvasRenderingContext2D, cam: Cam): void {
@@ -867,7 +968,22 @@ export class PerspectiveRenderer {
      * the rider turns so the sky still has a direction.
      */
     const pg = this.page;
-    ctx.fillStyle = pg.paper;
+    /*
+     * Last light (docs/51). The page is still paper where the sky meets the
+     * town — the skyline is printed against it — but above that the sky
+     * climbs through a cloud bank to a slate lid, so the town has an evening
+     * over it and the roofs and poles read as silhouettes. An owned town's
+     * lid comes lower and darker; a lit one lifts it toward the paper.
+     */
+    if (horizon > 0) {
+      const lid = pg.owned > 0 ? mix(SKY.lid, PRINT.ink, pg.owned * 0.5) : mix(SKY.lid, SKY.bank, pg.lit * 0.6);
+      const sky = ctx.createLinearGradient(0, 0, 0, horizon);
+      sky.addColorStop(0, lid);
+      sky.addColorStop(0.5, mix(SKY.bank, lid, 0.35));
+      sky.addColorStop(0.82, mix(pg.paper, SKY.bank, 0.45));
+      sky.addColorStop(1, pg.paper);
+      ctx.fillStyle = sky;
+    } else ctx.fillStyle = pg.paper;
     ctx.fillRect(0, 0, cam.w, Math.max(0, horizon));
     if (horizon > 8) {
       // An owned town has a lower, heavier sky: more rules, closer, darker.
@@ -1703,6 +1819,15 @@ export class PerspectiveRenderer {
      * lawn. Close to the eye only; past that a verge is a flat wash.
      */
     this.inkAs = Ink.Furniture;
+    for (const fl of LOT_FLOODS) {
+      if (!near(fl.at, 160)) continue;
+      const rot = Math.atan2(fl.aim.y - fl.at.y, fl.aim.x - fl.at.x);
+      if (near(fl.at, 110)) {
+        this.boxAt(cam, fl.at, rot, 0.3, 0.3, 0, FLOOD_H, PRINT.steel);
+        this.boxAt(cam, { x: fl.at.x + Math.cos(rot) * 0.3, y: fl.at.y + Math.sin(rot) * 0.3 }, rot, 0.5, 1.4, FLOOD_H - 0.2, FLOOD_H + 0.5, shade(PRINT.steel, -0.25));
+      }
+      this.lamps.push({ pool: fl.aim, head: { x: fl.at.x + Math.cos(rot) * 0.6, y: fl.at.y + Math.sin(rot) * 0.6 }, z: FLOOD_H + 0.1, r: 22 });
+    }
     let poleN = 0;
     for (const p of sd.poles) {
       poleN++;
@@ -1738,6 +1863,21 @@ export class PerspectiveRenderer {
         }
       }
       if (p.can) this.boxAt(cam, { x: p.at.x + across.x * 0.34, y: p.at.y + across.y * 0.34 }, p.rot, 0.46, 0.46, POLE_H - 2.5, POLE_H - 1.3, PRINT.steel);
+      /*
+       * A street lamp on every pole (docs/51): a steel arm out over the
+       * kerb and a housing on the end of it. Its light is laid on after the
+       * evening grade (drawLight), so it lifts the street instead of being
+       * darkened with it.
+       */
+      if (near(p.at, 120)) {
+        const reach = 1.5;
+        const head = { x: p.at.x - across.x * reach, y: p.at.y - across.y * reach };
+        if (near(p.at, 60)) {
+          this.boxAt(cam, { x: p.at.x - across.x * reach * 0.5, y: p.at.y - across.y * reach * 0.5 }, p.rot + Math.PI / 2, reach, 0.07, LAMP_Z + 0.12, LAMP_Z + 0.2, PRINT.steel);
+          this.boxAt(cam, head, p.rot, 0.34, 0.6, LAMP_Z - 0.06, LAMP_Z + 0.16, PRINT.steel);
+        }
+        this.lamps.push({ pool: head, head, z: LAMP_Z - 0.1, r: 9 });
+      }
     }
     this.collectSkateFeatures(sim, cam, near);
     this.collectDamage(sim, cam, near);
@@ -2993,6 +3133,22 @@ function dress(b: Building, sim: Sim): Dressing {
  * hue is the player's.
  */
 const POOL_LIGHT = '#F4F0E6';
+/** A light on the street: where its pool falls, where its housing hangs, how wide it throws. */
+interface Lamp { pool: Vec2; head: Vec2; z: number; r: number }
+/**
+ * The Lot's floodlights (docs/51): four masts on the grass just off the
+ * pad's corners, clear of every path in, each thrown in across the pad.
+ * Renderer dressing only — nothing in the world data stands here.
+ */
+export const LOT_FLOODS: Array<{ at: Vec2; aim: Vec2 }> = [
+  { at: { x: 291, y: 177 }, aim: { x: 318, y: 200 } },
+  { at: { x: 409, y: 177 }, aim: { x: 382, y: 200 } },
+  { at: { x: 291, y: 253 }, aim: { x: 318, y: 230 } },
+  { at: { x: 409, y: 253 }, aim: { x: 382, y: 230 } },
+];
+const FLOOD_H = 9.5;
+/** How high a street lamp's housing hangs. */
+const LAMP_Z = POLE_H - 1.1;
 
 /** Ramps: smooth poured concrete, a shade warmer than the paving, so a lip reads. */
 const RAMP_TOP = '#C9C1AE';

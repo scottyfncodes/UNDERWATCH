@@ -4,6 +4,9 @@ on:
   push:
     branches: ['**']
   pull_request:
+  # After the baseline workflow commits fresh screenshots (a commit made with
+  # GITHUB_TOKEN starts no runs), run CI on the branch from the Actions tab.
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -31,3 +34,36 @@ jobs:
 
       - name: Build
         run: npx vite build
+
+  browser:
+    name: Visual, accessibility and layout (Playwright)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # The Chromium build that matches the pinned @playwright/test.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Builds the game and serves it with `vite preview` (playwright.config.ts).
+      - name: Browser checks
+        run: npx playwright test
+        env:
+          CI: true
+
+      # Expected / actual / diff images for any screen that changed.
+      - name: Upload results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 14

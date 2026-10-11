@@ -66,6 +66,12 @@ export class Renderer {
    * it draws a border the phone crops.
    */
   safe = { top: 0, right: 0, bottom: 0, left: 0 };
+  /**
+   * The bottom edge of the HUD's top band, in CSS pixels, set by the host:
+   * the job strip and the corner buttons. A label clamped to the top of the
+   * glass is clamped under this, not under it.
+   */
+  hudTop = 0;
   private ctx: CanvasRenderingContext2D;
   w = 0; h = 0; dpr = 1;
   /** 0..1 wavefront progress, separate from sim.planViewBlend so it can overshoot. */
@@ -188,6 +194,45 @@ export class Renderer {
   }
 
   ripple(pos: Vec2, life = 0.9): void { this.ripples.push({ pos, t: 0, life }); }
+
+  /** Rings on the street, in the street view: a landing, a rail caught. */
+  private impacts: Array<{ pos: Vec2; t: number; life: number; k: number }> = [];
+
+  /**
+   * Something landed (docs/51): a ring of the player's amber goes out across
+   * the ground from where the wheels came down, and the dust comes up. `k`
+   * is how hard, 0..1.
+   */
+  impact(pos: Vec2, k: number): void {
+    const kk = clamp01(k);
+    this.impacts.push({ pos: { ...pos }, t: 0, life: 0.45 + kk * 0.25, k: kk });
+    if (this.impacts.length > 6) this.impacts.shift();
+    this.burst('dust', pos, 0.05, 4 + Math.round(kk * 6), this.sim.player.heading, 0.5 + kk * 0.6);
+  }
+
+  private drawImpacts(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
+    if (this.impacts.length === 0) return;
+    ctx.save();
+    this.impacts = this.impacts.filter((im) => {
+      im.t += dt;
+      if (im.t > im.life) return false;
+      const e = smoothstep(im.t / im.life);
+      const r = 0.5 + e * (1.4 + im.k * 1.8);
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i <= 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const q = this.perspective.project3(eye, im.pos.x + Math.cos(a) * r, im.pos.y + Math.sin(a) * r, 0.02, this.w, this.h);
+        if (!q) { first = true; continue; }
+        if (first) { ctx.moveTo(q.x, q.y); first = false; } else ctx.lineTo(q.x, q.y);
+      }
+      ctx.strokeStyle = alpha(VENEER.player, (1 - e) * (0.45 + im.k * 0.4));
+      ctx.lineWidth = 1 + (1 - e) * (1.5 + im.k * 2);
+      ctx.stroke();
+      return true;
+    });
+    ctx.restore();
+  }
   kick(a: number): void { this.cam.kick(a * this.settings.cameraShake); }
 
 
@@ -627,7 +672,7 @@ export class Renderer {
     const readFrom = this.scoreLine ? 1 : 0;
     ctx.font = '600 11px ui-monospace, Menlo, monospace';
     // Below the notes and toasts row, so nothing the town says covers it.
-    const top = this.safe.top + (this.touchHints ? 132 : 78);
+    const top = Math.max(this.safe.top + (this.touchHints ? 132 : 78), this.hudTop + 26);
     lines.forEach((l, i) => {
       const wd = ctx.measureText(l).width + 20;
       ctx.fillStyle = alpha('#0B1117', 0.72 * a);
@@ -694,7 +739,9 @@ export class Renderer {
     }
     if (!reading && !sim.recon.cameras.size) {
       ctx.fillStyle = alpha(PLAN_INK.reading, 0.7 * a);
-      ctx.fillText(RECON_COPY.focus, cx, cy + r + 12);
+      // Under the reticle — unless that is where the thumbs' buttons are, as
+      // on a small phone, and then just inside it.
+      ctx.fillText(RECON_COPY.focus, cx, Math.min(cy + r + 12, this.controlTop - 16, cy + r - 14));
     }
 
     // The probe: a spot read for what a stone there would turn.
@@ -930,7 +977,7 @@ export class Renderer {
       ctx.fillStyle = alpha('#0B1117', 0.6 * a);
       const label = this.waypointLabel ? `${this.waypointLabel} · ${Math.round(d)} m` : `${Math.round(d)} m`;
       const wd = ctx.measureText(label).width + 10;
-      const ly = Math.max(this.safe.top + 14, Math.min(this.h - 20, (foot.y + head.y) / 2));
+      const ly = Math.max(this.safe.top + 14, this.hudTop + 14, Math.min(this.h - 20, (foot.y + head.y) / 2));
       roundRect(ctx, head.x - wd / 2, ly - 8, wd, 16, 8); ctx.fill();
       ctx.fillStyle = alpha('#F6F4EE', 0.95 * a);
       ctx.fillText(label, head.x, ly + 0.5);
@@ -1210,6 +1257,7 @@ export class Renderer {
       this.mood += (want - this.mood) * (1 - Math.exp(-dt / (want < this.mood ? 0.5 : 1.8)));
       this.perspective.mood = this.mood;
       this.perspective.draw(ctx, sim, eye, this.w, this.h, false);
+      this.drawImpacts(ctx, eye, dt);
       this.drawParticles(ctx, eye);
       this.drawStreaks(ctx, eye);
       // A sling being pulled back: the arc it will fly, from the rider.
