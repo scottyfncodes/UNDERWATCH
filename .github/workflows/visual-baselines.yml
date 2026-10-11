@@ -1,0 +1,42 @@
+name: Visual baselines
+
+# Re-renders e2e/__screenshots__ on the same runner image CI compares on, and
+# commits them to the branch. Use it only after an intended design change:
+# push a commit whose message contains "[update baselines]", or run
+# Actions > Visual baselines > Run workflow on the branch. Never use it to
+# make an unexplained difference go away. Commits made with GITHUB_TOKEN do
+# not start new runs, so push again (or re-run CI) afterwards.
+
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: >-
+      github.ref != 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[update baselines]'))
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test e2e/visual.spec.ts --update-snapshots=all
+        env:
+          CI: true
+      - name: Commit baselines
+        run: |
+          git add e2e/__screenshots__
+          if git diff --cached --quiet; then echo "Baselines unchanged."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update visual baselines"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

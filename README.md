@@ -7,9 +7,30 @@ to stay free of it is to become something it cannot predict.
 ```
 npm install
 npm run dev      # http://localhost:5173
-npm test         # 704 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
+npm test         # 709 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
 npm run build
+npm run test:e2e # browser checks: visual and accessibility (axe)
 ```
+
+### Browser checks
+
+`npm run test:e2e` builds the game, serves it, and drives it in Chromium as an
+iPhone (upright and on its side) and as a desktop:
+
+- `e2e/visual.spec.ts` compares the title, accessibility sheet, job board,
+  brief and pause menu with the baselines in `e2e/__screenshots__/`. The town's
+  canvas is hidden for these, so only the interface is judged.
+- `e2e/a11y.spec.ts` runs axe-core (WCAG 2.2 A/AA) on the same screens and
+  fails on anything serious or critical.
+
+Baselines are rendered on the CI runner. After an intended design change,
+push a commit whose message contains `[update baselines]` (or run **Actions →
+Visual baselines**), and the workflow commits fresh ones. On failure, CI
+attaches expected/actual/diff images. `node scripts/flow-shots.mjs <dir>` (with
+`npm run dev` running) captures every screen with the town visible, for design
+passes. There is no WebKit in the cloud image, so the "iPhone" is Chromium with
+an iPhone's viewport, density, touch and user agent: right for layout, not a
+substitute for a real phone.
 
 ## What this is
 
