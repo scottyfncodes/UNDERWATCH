@@ -128,9 +128,33 @@ export const SKY = {
   top: '#CEC7B6',
   mid: '#D4CDBD',
   horizon: '#D7D0C0',
+  /**
+   * Last light (docs/51). The lid of the sky at the top of the glass, and
+   * the cloud bank between it and the band of dirty light at the horizon.
+   * Both cool, both quiet: the only colour up there is the relay's cyan.
+   */
+  lid: '#262C34',
+  bank: '#59606A',
   /** The far field: distance is printed lighter, fading into the paper. */
   haze: '#D7D0C0',
   ground: '#8A8976',
+};
+
+/**
+ * The light over the street (docs/51): the evening the print is seen in.
+ *
+ * A multiply grade, so ink stays ink and paper goes down with everything
+ * else, never a coloured filter on top. The street falls toward a cool slate
+ * at the edges of the glass and toward the near ground, and holds its full
+ * value in a soft pool round the rider: the eye goes where the kid is.
+ */
+export const LIGHT = {
+  /** The street at the edge of the glass, multiplied. */
+  edge: '#727B8B',
+  /** The ground falling away from the horizon toward the thumbs. */
+  near: '#6E7586',
+  /** A street lamp's light: paper-white, never the player's amber. */
+  lamp: '#E8E1D0',
 };
 
 /**
