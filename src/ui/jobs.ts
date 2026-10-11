@@ -237,6 +237,8 @@ export class JobHud {
   private toastAt = -1;
   /** Today's condition, named on the run's top line when it is not an ordinary day. */
   condition: string | null = null;
+  /** The strip's bottom edge on the glass, in CSS pixels. */
+  bottom = 0;
 
   constructor(host: HTMLElement) {
     this.el = document.createElement('div');
@@ -250,6 +252,15 @@ export class JobHud {
     this.toast = document.createElement('div');
     this.toast.id = 'job-move';
     host.appendChild(this.toast);
+    // The strip's bottom edge, for whatever has to start under it (mobile.css).
+    // It grows from one line to four as things start looking, so it is
+    // measured rather than assumed.
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => {
+        this.bottom = Math.round(this.el.getBoundingClientRect().bottom);
+        document.documentElement.style.setProperty('--band-bottom', `${this.bottom}px`);
+      }).observe(this.el);
+    }
   }
 
   setVisible(on: boolean): void {

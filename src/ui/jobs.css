@@ -267,9 +267,20 @@
     background: var(--brackets), rgba(9, 14, 20, 0.6);
   }
   #job-hud .jh-top, #job-hud .jh-pct, #job-hud .jh-obj small { display: none; }
-  #job-hud .jh-obj { display: flex; align-items: baseline; margin: 0 0 3px; font-size: 1.1em; white-space: nowrap; }
-  #job-hud .jh-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  #job-hud .jh-dist { flex: none; }
+  /*
+   * Where you are going is never cut short. It used to share one line with
+   * the distance and the clock and lose the fight: "SHOOT FROM: E…" on an
+   * iPhone, which is the one word the strip exists to say. Now the name takes
+   * the line it needs (two at most), and the distance and clock drop to the
+   * next line only when there is no room beside it.
+   */
+  #job-hud .jh-obj { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 1px; margin: 0 0 3px; font-size: 1.1em; }
+  #job-hud .jh-label {
+    flex: 0 1 auto; min-width: 0;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  }
+  #job-hud .jh-dist { flex: none; margin-left: 0; }
+  #job-hud .jh-obj-time { margin-left: auto; }
   #job-hud .jh-exp { gap: 6px; white-space: nowrap; overflow: hidden; }
   #job-hud .jh-bar { min-width: 28px; }
   #job-hud .jh-level { min-width: 0; padding: 0 4px; }
@@ -285,9 +296,11 @@
   #job-callout { font-size: calc(19px * var(--text-scale)); top: 30%; gap: 10px; }
 }
 
-/* In a job on a phone, the control hint sits under the job panel, not on it. */
+/* In a job on a phone, the control hint sits under the job panel, not on it.
+   --band-bottom is the strip's measured bottom edge (JobHud publishes it), so
+   this holds whether the strip is one line or four. */
 @media (max-width: 640px), (pointer: coarse) {
-  html.jobs-mode #prompts { top: calc(var(--safe-top, 0px) + 84px); }
+  html.jobs-mode #prompts { top: max(calc(var(--safe-top, 0px) + 62px), calc(var(--band-bottom, 0px) + 8px)); }
 }
 /* And it steps aside entirely while something has you — the strip, the
    callout and the chase own the top of the glass then — and for good once a

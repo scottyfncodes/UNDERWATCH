@@ -104,6 +104,8 @@ class Game {
   private run: JobRun | null = null;
   /** Whether something has the rider in a job, as last written to the document. */
   private hudBusy = false;
+  /** Mirrors the plan view onto the document, so the HUD can make room for it. */
+  private planOpenClass = false;
   /** Which day it is in the player's calendar, and so which conditions the board has today. */
   private readonly day = (() => { const d = new Date(); return dayIndex(d.getFullYear(), d.getMonth(), d.getDate()); })();
   private readonly condition: Condition = conditionFor(this.day);
@@ -1463,6 +1465,11 @@ class Game {
     this.renderer.chase.focus = e
       ? (e.kind === 'person' ? (e.id === 'devon' ? this.sim.devonPos : this.sim.person(e.id)?.pos ?? e.pos) : e.pos)
       : null;
+    // What the HUD holds along the top edge, so the world's labels clamp under
+    // it: the job strip in a job, and on a phone the corner buttons (44 px
+    // from 10 px down) in any mode.
+    const corner = this.touchPrimary ? this.renderer.safe.top + 54 : 0;
+    this.renderer.hudTop = Math.max(corner, this.run && this.mode === 'jobs' ? this.jobHud.bottom : 0);
     this.renderer.render(dt);
     // In a job the exposure meter is the system's own account of you; the
     // frame's corners say the same thing the strip at the top does.
@@ -1470,6 +1477,8 @@ class Game {
     this.hud.setWatchOverride(level);
     const busy = !!level && level !== 'UNSEEN';
     if (busy !== this.hudBusy) { this.hudBusy = busy; document.documentElement.classList.toggle('hud-busy', busy); }
+    const planOpen = this.phase === 'play' && this.sim.planViewActive;
+    if (planOpen !== this.planOpenClass) { this.planOpenClass = planOpen; document.documentElement.classList.toggle('plan-open', planOpen); }
     this.hud.update(dt);
     this.troubleHud.update(this.mode === 'jobs' ? this.trouble : null);
     if (this.run && this.mode === 'jobs') {

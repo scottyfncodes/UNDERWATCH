@@ -66,6 +66,12 @@ export class Renderer {
    * it draws a border the phone crops.
    */
   safe = { top: 0, right: 0, bottom: 0, left: 0 };
+  /**
+   * The bottom edge of the HUD's top band, in CSS pixels, set by the host:
+   * the job strip and the corner buttons. A label clamped to the top of the
+   * glass is clamped under this, not under it.
+   */
+  hudTop = 0;
   private ctx: CanvasRenderingContext2D;
   w = 0; h = 0; dpr = 1;
   /** 0..1 wavefront progress, separate from sim.planViewBlend so it can overshoot. */
@@ -627,7 +633,7 @@ export class Renderer {
     const readFrom = this.scoreLine ? 1 : 0;
     ctx.font = '600 11px ui-monospace, Menlo, monospace';
     // Below the notes and toasts row, so nothing the town says covers it.
-    const top = this.safe.top + (this.touchHints ? 132 : 78);
+    const top = Math.max(this.safe.top + (this.touchHints ? 132 : 78), this.hudTop + 26);
     lines.forEach((l, i) => {
       const wd = ctx.measureText(l).width + 20;
       ctx.fillStyle = alpha('#0B1117', 0.72 * a);
@@ -694,7 +700,9 @@ export class Renderer {
     }
     if (!reading && !sim.recon.cameras.size) {
       ctx.fillStyle = alpha(PLAN_INK.reading, 0.7 * a);
-      ctx.fillText(RECON_COPY.focus, cx, cy + r + 12);
+      // Under the reticle — unless that is where the thumbs' buttons are, as
+      // on a small phone, and then just inside it.
+      ctx.fillText(RECON_COPY.focus, cx, Math.min(cy + r + 12, this.controlTop - 16, cy + r - 14));
     }
 
     // The probe: a spot read for what a stone there would turn.
@@ -930,7 +938,7 @@ export class Renderer {
       ctx.fillStyle = alpha('#0B1117', 0.6 * a);
       const label = this.waypointLabel ? `${this.waypointLabel} · ${Math.round(d)} m` : `${Math.round(d)} m`;
       const wd = ctx.measureText(label).width + 10;
-      const ly = Math.max(this.safe.top + 14, Math.min(this.h - 20, (foot.y + head.y) / 2));
+      const ly = Math.max(this.safe.top + 14, this.hudTop + 14, Math.min(this.h - 20, (foot.y + head.y) / 2));
       roundRect(ctx, head.x - wd / 2, ly - 8, wd, 16, 8); ctx.fill();
       ctx.fillStyle = alpha('#F6F4EE', 0.95 * a);
       ctx.fillText(label, head.x, ly + 0.5);

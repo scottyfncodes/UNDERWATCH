@@ -5,6 +5,7 @@ import { defineConfig } from '@playwright/test';
  *
  *   e2e/visual.spec.ts   the interface screens, compared with committed baselines
  *   e2e/a11y.spec.ts     axe-core, WCAG 2.2 A/AA, fails on serious or critical
+ *   e2e/layout.spec.ts   the run's geometry: nothing the player reads collides
  *
  * The town is drawn on a canvas that never stops moving, so the visual spec
  * masks it and judges the interface over it. Three devices: an iPhone held
@@ -51,6 +52,8 @@ export default defineConfig({
     { name: 'iphone', use: { ...iphone, viewport: { width: 393, height: 852 } } },
     { name: 'iphone-landscape', use: { ...iphone, viewport: { width: 852, height: 393 } } },
     { name: 'desktop', use: { viewport: { width: 1280, height: 800 } } },
+    // The smallest iPhone still sold, for the geometry rules only.
+    { name: 'iphone-se', testMatch: /layout\.spec/, use: { ...iphone, viewport: { width: 375, height: 667 } } },
   ],
   webServer: process.env.BASE_URL
     ? undefined

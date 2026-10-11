@@ -9,7 +9,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm test         # 709 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
 npm run build
-npm run test:e2e # browser checks: visual and accessibility (axe)
+npm run test:e2e # browser checks: visual, accessibility (axe) and in-run layout
 ```
 
 ### Browser checks
@@ -22,6 +22,10 @@ iPhone (upright and on its side) and as a desktop:
   canvas is hidden for these, so only the interface is judged.
 - `e2e/a11y.spec.ts` runs axe-core (WCAG 2.2 A/AA) on the same screens and
   fails on anything serious or critical.
+- `e2e/layout.spec.ts` starts a job and checks the geometry of the run (also
+  on an iPhone SE): the objective is never cut off, the town's cards never
+  land on the job strip, the corner buttons or the thumbs' controls, and they
+  step back while the plan is open.
 
 Baselines are rendered on the CI runner. After an intended design change,
 push a commit whose message contains `[update baselines]` (or run **Actions →
