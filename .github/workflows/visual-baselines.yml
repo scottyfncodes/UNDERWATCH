@@ -1,6 +1,8 @@
 name: Visual baselines
 
-# Re-renders e2e/__screenshots__ on the same runner image CI compares on, and
+# Re-renders the e2e/__screenshots__ that no longer match (only those: a
+# screen inside the tolerance keeps its file) on the runner image CI compares
+# on, and
 # commits them to the branch. Use it only after an intended design change:
 # push a commit whose message contains "[update baselines]", or run
 # Actions > Visual baselines > Run workflow on the branch. Never use it to
@@ -29,7 +31,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test e2e/visual.spec.ts --update-snapshots=all
+      - run: npx playwright test e2e/visual.spec.ts --update-snapshots=changed
         env:
           CI: true
       - name: Commit baselines
