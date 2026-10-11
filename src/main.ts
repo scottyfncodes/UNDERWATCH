@@ -106,6 +106,8 @@ class Game {
   private hudBusy = false;
   /** Mirrors the plan view onto the document, so the HUD can make room for it. */
   private planOpenClass = false;
+  /** Seconds to the next spark off the trucks while a grind holds. */
+  private sparkIn = 0;
   /** Which day it is in the player's calendar, and so which conditions the board has today. */
   private readonly day = (() => { const d = new Date(); return dayIndex(d.getFullYear(), d.getMonth(), d.getDate()); })();
   private readonly condition: Condition = conditionFor(this.day);
@@ -1002,13 +1004,18 @@ class Game {
     });
     bus.on('world:glass', ({ pos }) => { this.audio.impact('glass', 1, 1); this.renderer.burst('chip', pos, 1.5, 10, 0, 1.1); });
     // Grinds: the trucks biting the rail, and letting go of it.
-    bus.on('player:grind', () => { this.audio.land(0.55); this.audio.impact('metal', 0.5, 1); this.renderer.kick(0.07); });
+    bus.on('player:grind', ({ pos }) => {
+      this.audio.land(0.55); this.audio.impact('metal', 0.5, 1); this.renderer.kick(0.07);
+      this.renderer.impact(pos, 0.35);
+      this.renderer.burst('spark', pos, this.sim.grind?.line.z ?? 0.5, 8, this.sim.player.heading, 1.1);
+    });
     bus.on('player:grindEnd', () => this.audio.pop());
     bus.on('player:roof', ({ pos }) => this.renderer.ripple(pos, 0.5));
     bus.on('player:slide', ({ speed }) => this.audio.slide(Math.min(1, speed / 12)));
     bus.on('player:land', ({ speed }) => {
       this.audio.land(Math.min(1, speed / 12));
       this.renderer.kick(0.06 + Math.min(0.1, speed / 120));
+      this.renderer.impact(this.sim.player.pos, Math.min(1, speed / 11));
     });
     bus.on('player:bail', ({ pos }) => {
       this.audio.bail();
@@ -1473,6 +1480,15 @@ class Game {
     // from 10 px down) in any mode.
     const corner = this.touchPrimary ? this.renderer.safe.top + 54 : 0;
     this.renderer.hudTop = Math.max(corner, this.run && this.mode === 'jobs' ? this.jobHud.bottom : 0);
+    // Sparks off the trucks for as long as a grind holds (docs/51).
+    const grind = this.sim.grind;
+    if (grind && this.phase === 'play' && this.sim.player.speed > 1.5) {
+      this.sparkIn -= dt;
+      if (this.sparkIn <= 0) {
+        this.sparkIn = 0.06;
+        this.renderer.burst('spark', this.sim.player.pos, grind.line.z, 2, this.sim.player.heading, 0.7 + Math.min(0.6, this.sim.player.speed / 14));
+      }
+    } else this.sparkIn = 0;
     this.renderer.render(dt);
     // In a job the exposure meter is the system's own account of you; the
     // frame's corners say the same thing the strip at the top does.

@@ -194,6 +194,45 @@ export class Renderer {
   }
 
   ripple(pos: Vec2, life = 0.9): void { this.ripples.push({ pos, t: 0, life }); }
+
+  /** Rings on the street, in the street view: a landing, a rail caught. */
+  private impacts: Array<{ pos: Vec2; t: number; life: number; k: number }> = [];
+
+  /**
+   * Something landed (docs/51): a ring of the player's amber goes out across
+   * the ground from where the wheels came down, and the dust comes up. `k`
+   * is how hard, 0..1.
+   */
+  impact(pos: Vec2, k: number): void {
+    const kk = clamp01(k);
+    this.impacts.push({ pos: { ...pos }, t: 0, life: 0.45 + kk * 0.25, k: kk });
+    if (this.impacts.length > 6) this.impacts.shift();
+    this.burst('dust', pos, 0.05, 4 + Math.round(kk * 6), this.sim.player.heading, 0.5 + kk * 0.6);
+  }
+
+  private drawImpacts(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
+    if (this.impacts.length === 0) return;
+    ctx.save();
+    this.impacts = this.impacts.filter((im) => {
+      im.t += dt;
+      if (im.t > im.life) return false;
+      const e = smoothstep(im.t / im.life);
+      const r = 0.5 + e * (1.4 + im.k * 1.8);
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i <= 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const q = this.perspective.project3(eye, im.pos.x + Math.cos(a) * r, im.pos.y + Math.sin(a) * r, 0.02, this.w, this.h);
+        if (!q) { first = true; continue; }
+        if (first) { ctx.moveTo(q.x, q.y); first = false; } else ctx.lineTo(q.x, q.y);
+      }
+      ctx.strokeStyle = alpha(VENEER.player, (1 - e) * (0.45 + im.k * 0.4));
+      ctx.lineWidth = 1 + (1 - e) * (1.5 + im.k * 2);
+      ctx.stroke();
+      return true;
+    });
+    ctx.restore();
+  }
   kick(a: number): void { this.cam.kick(a * this.settings.cameraShake); }
 
 
@@ -1218,6 +1257,7 @@ export class Renderer {
       this.mood += (want - this.mood) * (1 - Math.exp(-dt / (want < this.mood ? 0.5 : 1.8)));
       this.perspective.mood = this.mood;
       this.perspective.draw(ctx, sim, eye, this.w, this.h, false);
+      this.drawImpacts(ctx, eye, dt);
       this.drawParticles(ctx, eye);
       this.drawStreaks(ctx, eye);
       // A sling being pulled back: the arc it will fly, from the rider.
