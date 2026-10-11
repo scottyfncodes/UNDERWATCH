@@ -9,7 +9,16 @@ import { openTitle, openBoard, openBrief, openPause, press } from './flow';
  * every frame.
  */
 const BLANK_TOWN = '#game { visibility: hidden !important; } html, body { background: #3A4650 !important; }';
-const shoot = async (page: Page) => { await page.addStyleTag({ content: BLANK_TOWN }); return {}; };
+const shoot = async (page: Page) => {
+  await page.addStyleTag({ content: BLANK_TOWN });
+  // A tap leaves the pointer where the finger was, and a sheet that opens
+  // under it (the accessibility sheet's DONE) may or may not be judged
+  // hovered depending on when the browser recomputes hover. Park it in a
+  // corner so no screen is compared in a half-hovered state.
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(100);
+  return {};
+};
 
 test('title', async ({ page }) => {
   await openTitle(page);
