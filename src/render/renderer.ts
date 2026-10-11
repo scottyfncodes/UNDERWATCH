@@ -19,6 +19,10 @@ import { ChaseCamera, EYE_Z, PerspectiveRenderer, type CamState } from './perspe
 import { MachineRenderer } from './machine';
 import { readPlan, type PlanReading } from './plan';
 import { moodOf } from './mood';
+import { trackTag, type WatchTone } from './watch';
+
+/** Samples in the board's trail, a thirtieth of a second apart. */
+const TRAIL = 18;
 import { VeneerRenderer, ROOF_K, roundRect, taperedStroke } from './veneer';
 import { MACHINE, PRINT, SIGNAL, TECH, VENEER, alpha, mix, riskColour, shade } from './palette';
 
@@ -196,7 +200,7 @@ export class Renderer {
   ripple(pos: Vec2, life = 0.9): void { this.ripples.push({ pos, t: 0, life }); }
 
   /** Rings on the street, in the street view: a landing, a rail caught. */
-  private impacts: Array<{ pos: Vec2; t: number; life: number; k: number }> = [];
+  private impacts: Array<{ pos: Vec2; t: number; life: number; k: number; kind?: 'scuff' | 'objective' }> = [];
 
   /**
    * Something landed (docs/51): a ring of the player's amber goes out across
@@ -216,24 +220,58 @@ export class Renderer {
     this.impacts = this.impacts.filter((im) => {
       im.t += dt;
       if (im.t > im.life) return false;
+      if (im.t < 0) return true;
       const e = smoothstep(im.t / im.life);
-      const r = 0.5 + e * (1.4 + im.k * 1.8);
+      const scuff = im.kind === 'scuff', goal = im.kind === 'objective';
+      const r = goal ? 0.8 + e * (3.2 + im.k * 2.4) : scuff ? 0.6 + e * 2.4 : 0.5 + e * (1.4 + im.k * 1.8);
       ctx.beginPath();
       let first = true;
       for (let i = 0; i <= 24; i++) {
+        // A scuff is broken: every other stretch of the ring is missing.
+        if (scuff && (i >> 1) % 2 === 1) { first = true; continue; }
         const a = (i / 24) * Math.PI * 2;
         const q = this.perspective.project3(eye, im.pos.x + Math.cos(a) * r, im.pos.y + Math.sin(a) * r, 0.02, this.w, this.h);
         if (!q) { first = true; continue; }
         if (first) { ctx.moveTo(q.x, q.y); first = false; } else ctx.lineTo(q.x, q.y);
       }
-      ctx.strokeStyle = alpha(VENEER.player, (1 - e) * (0.45 + im.k * 0.4));
-      ctx.lineWidth = 1 + (1 - e) * (1.5 + im.k * 2);
+      ctx.strokeStyle = scuff ? alpha('#D9CFBE', (1 - e) * 0.8) : alpha(VENEER.player, (1 - e) * (goal ? 0.85 : 0.45 + im.k * 0.4));
+      ctx.lineWidth = scuff ? 1 + (1 - e) * 3 : 1 + (1 - e) * (1.5 + im.k * 2);
       ctx.stroke();
       return true;
     });
     ctx.restore();
   }
-  kick(a: number): void { this.cam.kick(a * this.settings.cameraShake); }
+  kick(a: number): void {
+    const k = this.settings.cameraShake;
+    this.cam.kick(a * k);
+    // The street's own rig answers too (docs/52); motion off, it holds still.
+    if (!this.settings.reduceMotion) this.chase.bump(Math.min(1, a * 4) * k, a >= 0.2 ? Math.min(1, (a - 0.15) * 2) * k : 0);
+  }
+
+  /**
+   * A slam (docs/52). Not the amber of a move made: a scuff of pale grit
+   * across the ground, broken, where the board went one way and the kid
+   * the other, and a cloud of dust. The chain-lost callout says the rest.
+   */
+  scuff(pos: Vec2): void {
+    this.impacts.push({ pos: { ...pos }, t: 0, life: 0.7, k: 1, kind: 'scuff' });
+    if (this.impacts.length > 6) this.impacts.shift();
+    this.burst('dust', pos, 0.05, 14, this.sim.player.heading, 1.2);
+    this.burst('chip', pos, 0.05, 4, this.sim.player.heading, 0.8);
+  }
+
+  /** Something on the job's list was done here: two rings and the beam flaring. */
+  objective(pos: Vec2): void {
+    this.impacts.push({ pos: { ...pos }, t: 0, life: 1.1, k: 1, kind: 'objective' });
+    this.impacts.push({ pos: { ...pos }, t: -0.18, life: 1.1, k: 0.6, kind: 'objective' });
+    if (this.impacts.length > 8) this.impacts.splice(0, this.impacts.length - 8);
+    this.flare = { pos: { ...pos }, t: 0 };
+  }
+  private flare: { pos: Vec2; t: number } | null = null;
+
+  /** The board came all the way round and the feet caught it: a mark on the catch. */
+  caught(): void { this.catchT = 0; }
+  private catchT = 9;
 
 
 
@@ -978,9 +1016,11 @@ export class Renderer {
       const label = this.waypointLabel ? `${this.waypointLabel} · ${Math.round(d)} m` : `${Math.round(d)} m`;
       const wd = ctx.measureText(label).width + 10;
       const ly = Math.max(this.safe.top + 14, this.hudTop + 14, Math.min(this.h - 20, (foot.y + head.y) / 2));
-      roundRect(ctx, head.x - wd / 2, ly - 8, wd, 16, 8); ctx.fill();
+      // Kept on the glass: a beam near the edge used to cut its own name off.
+      const lx = Math.max(this.safe.left + wd / 2 + 6, Math.min(this.w - this.safe.right - wd / 2 - 6, head.x));
+      roundRect(ctx, lx - wd / 2, ly - 8, wd, 16, 8); ctx.fill();
       ctx.fillStyle = alpha('#F6F4EE', 0.95 * a);
-      ctx.fillText(label, head.x, ly + 0.5);
+      ctx.fillText(label, lx, ly + 0.5);
     } else {
       // Round the edge: the direction relative to the way the camera faces.
       const rel = Math.atan2(wp.y - eye.pos.y, wp.x - eye.pos.x) - eye.yaw;
@@ -999,8 +1039,10 @@ export class Renderer {
       const label = this.waypointLabel ? `${this.waypointLabel} · ${Math.round(d)} m` : `${Math.round(d)} m`;
       const wd = ctx.measureText(label).width + 10;
       // The label stays on the glass, whichever edge the arrow is on.
-      const lx = Math.max(this.safe.left + wd / 2 + 6, Math.min(this.w - this.safe.right - wd / 2 - 6, x - sx * 26));
-      const ly = y - sy * 26;
+      // Set in from the arrow by its own half-width, so the arrow points
+      // past the name rather than being drawn through it.
+      const lx = Math.max(this.safe.left + wd / 2 + 6, Math.min(this.w - this.safe.right - wd / 2 - 6, x - sx * (wd / 2 + 24)));
+      const ly = y - sy * 28;
       roundRect(ctx, lx - wd / 2, ly - 8, wd, 16, 8); ctx.fill();
       ctx.fillStyle = alpha('#F6F4EE', 0.95 * a);
       ctx.fillText(label, lx, ly + 4);
@@ -1216,6 +1258,8 @@ export class Renderer {
   render(dt: number): void {
     const sim = this.sim;
     const ctx = this.ctx;
+    this.controls.live.grinding = !!sim.grind;
+    this.controls.live.trick = !!sim.player.trick && !sim.player.trick.landed || !!sim.player.grab;
 
     this.stepParticles(dt);
     this.release.t += dt;
@@ -1247,7 +1291,15 @@ export class Renderer {
     if (sim.planViewBlend < 0.999) {
       const eye = this.chase.state(sim);
       this.lastEye = eye;
-      this.perspective.lens = 1;
+      /*
+       * Speed, felt (docs/52): the lens opens a few degrees as the board
+       * nears its top speed, so the street rushes a little at the edges.
+       * Never with motion reduced.
+       */
+      const sp = clamp01(sim.player.speed / Math.max(1, sim.playerMaxSpeed));
+      const wantLens = this.settings.reduceMotion || sim.player.aiming ? 1 : 1 - 0.065 * smoothstep(clamp01((sp - 0.45) / 0.55));
+      this.speedLens += (wantLens - this.speedLens) * (1 - Math.exp(-dt / 0.35));
+      this.perspective.lens = this.speedLens;
       this.perspective.slingPose = this.slingPose();
       this.perspective.seen = this.seenPlaces;
       this.perspective.fresh = this.freshPlaces;
@@ -1257,8 +1309,12 @@ export class Renderer {
       this.mood += (want - this.mood) * (1 - Math.exp(-dt / (want < this.mood ? 0.5 : 1.8)));
       this.perspective.mood = this.mood;
       this.perspective.draw(ctx, sim, eye, this.w, this.h, false);
+      this.drawTrail(ctx, eye, dt);
       this.drawImpacts(ctx, eye, dt);
+      this.drawFlare(ctx, eye, dt);
       this.drawParticles(ctx, eye);
+      this.drawCatch(ctx, eye, dt);
+      this.drawSnap(ctx, eye);
       this.drawStreaks(ctx, eye);
       // A sling being pulled back: the arc it will fly, from the rider.
       if (sim.player.aiming && !sim.aimMode && sim.player.draw > 0.02) {
@@ -1272,6 +1328,7 @@ export class Renderer {
       this.drawSpeech(ctx, eye, dt);
       this.drawInteractPrompt(ctx, eye, dt);
       this.drawMatchLock(ctx, eye, dt);
+      this.drawTrack(ctx, eye, dt);
       this.drawBeacon(ctx, eye, 1 - sim.planViewBlend);
       this.drawTitleWatch(ctx, eye, dt);
     }
@@ -1936,6 +1993,243 @@ export class Renderer {
     ctx.restore();
   }
 
+  private speedLens = 1;
+
+  /*
+   * The line the board draws (docs/52): where the wheels have just been, as
+   * a thin ribbon of the player's amber that fades behind them. Only at
+   * speed and in the air — rolling about, there is nothing to read — and it
+   * lifts with the board, so an air off a kicker draws its own arc. A fixed
+   * ring of samples: nothing is allocated per frame.
+   */
+  private trailX = new Float32Array(TRAIL);
+  private trailY = new Float32Array(TRAIL);
+  private trailZ = new Float32Array(TRAIL);
+  private trailK = new Float32Array(TRAIL);
+  private trailHead = 0;
+  private trailN = 0;
+  private trailClock = 0;
+
+  private drawTrail(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
+    const sim = this.sim;
+    const p = sim.player;
+    const sp = clamp01(p.speed / Math.max(1, sim.playerMaxSpeed));
+    const air = p.stance === 'AIR' || !!sim.grind;
+    const k = p.onBoard && p.stance !== 'BAIL' ? Math.max(air ? 0.75 : 0, smoothstep(clamp01((sp - 0.5) / 0.4))) : 0;
+    this.trailClock -= dt;
+    if (this.trailClock <= 0) {
+      this.trailClock = 1 / 30;
+      const i = this.trailHead;
+      this.trailX[i] = p.pos.x; this.trailY[i] = p.pos.y; this.trailZ[i] = p.z + 0.06; this.trailK[i] = k;
+      this.trailHead = (i + 1) % TRAIL;
+      this.trailN = Math.min(TRAIL, this.trailN + 1);
+    }
+    if (this.overlaysHidden || this.trailN < 4) return;
+    ctx.save();
+    ctx.lineCap = 'round';
+    let prev: { x: number; y: number; s: number } | null = null;
+    // Oldest to newest, skipping the last few: the ribbon starts behind the
+    // board, never on it.
+    for (let n = this.trailN - 1; n >= 3; n--) {
+      const i = (this.trailHead - 1 - n + TRAIL * 2) % TRAIL;
+      const kk = this.trailK[i];
+      const q = kk > 0.01 ? this.perspective.project3(eye, this.trailX[i], this.trailY[i], this.trailZ[i], this.w, this.h) : null;
+      // A jump in position (a restart, a teleport) is not a line the board drew.
+      if (n < this.trailN - 1) {
+        const j = (i - 1 + TRAIL) % TRAIL;
+        if (Math.abs(this.trailX[i] - this.trailX[j]) + Math.abs(this.trailY[i] - this.trailY[j]) > 3) prev = null;
+      }
+      if (q && prev) {
+        const age = n / TRAIL;
+        const a = kk * (1 - age) * 0.5;
+        ctx.strokeStyle = alpha(VENEER.player, a);
+        ctx.lineWidth = Math.max(1, Math.min(5, 0.12 * q.s)) * (1 - age * 0.6);
+        ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+      }
+      prev = q;
+    }
+    ctx.restore();
+  }
+
+  /** A done point: its beam flares up and goes. */
+  private drawFlare(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
+    const f = this.flare;
+    if (!f) return;
+    f.t += dt;
+    if (f.t > 0.9) { this.flare = null; return; }
+    const foot = this.perspective.project3(eye, f.pos.x, f.pos.y, 0, this.w, this.h);
+    const head = this.perspective.project3(eye, f.pos.x, f.pos.y, 22, this.w, this.h);
+    if (!foot || !head) return;
+    const a = 1 - smoothstep(f.t / 0.9);
+    const g = ctx.createLinearGradient(foot.x, foot.y, head.x, head.y);
+    g.addColorStop(0, alpha('#FFF6DD', 0.9 * a));
+    g.addColorStop(0.4, alpha(VENEER.player, 0.6 * a));
+    g.addColorStop(1, alpha(VENEER.player, 0));
+    ctx.save();
+    ctx.strokeStyle = g;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = Math.max(3, Math.min(14, 0.7 * foot.s)) * (1 + (1 - a));
+    ctx.beginPath(); ctx.moveTo(foot.x, foot.y); ctx.lineTo(head.x, head.y); ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
+   * The catch (docs/52): the board came round and the feet are on it. Four
+   * short ticks snap in round the board and go, in amber — a mark made at
+   * the instant the timing was right, small enough to sit on the board
+   * rather than over the rider.
+   */
+  private drawCatch(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
+    this.catchT += dt;
+    if (this.catchT > 0.32 || this.overlaysHidden) return;
+    const p = this.sim.player;
+    const at = this.perspective.project3(eye, p.pos.x, p.pos.y, p.z + 0.1, this.w, this.h);
+    if (!at) return;
+    const e = smoothstep(this.catchT / 0.32);
+    const r = Math.max(12, Math.min(40, 0.9 * at.s)) * (0.7 + e * 0.6);
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (const [col, w] of [[alpha('#0A1016', 0.4 * (1 - e)), 4.5], [alpha(VENEER.player, 1 - e), 2.2]] as const) {
+      ctx.strokeStyle = col; ctx.lineWidth = w;
+      ctx.beginPath();
+      for (let q = 0; q < 4; q++) {
+        const a = q * Math.PI / 2 + Math.PI / 4;
+        ctx.moveTo(at.x + Math.cos(a) * r, at.y + Math.sin(a) * r * 0.7);
+        ctx.lineTo(at.x + Math.cos(a) * (r + 7), at.y + Math.sin(a) * (r + 7) * 0.7);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /**
+   * The band let go, seen from behind the rider (docs/52): a short white
+   * snap off the fork along the throw, for the tenth of a second the stone
+   * is too small and too fast to see. The stone's own streak takes over.
+   */
+  private drawSnap(ctx: CanvasRenderingContext2D, eye: CamState): void {
+    const t = this.release.t;
+    if (t > 0.14 || this.overlaysHidden || this.sim.aimMode) return;
+    const p = this.sim.player;
+    const { angle } = this.sim.aim;
+    const from = this.perspective.project3(eye, p.pos.x, p.pos.y, LAUNCH_Z, this.w, this.h);
+    const to = this.perspective.project3(eye, p.pos.x + Math.cos(angle) * 3.5, p.pos.y + Math.sin(angle) * 3.5, LAUNCH_Z + 0.4, this.w, this.h);
+    if (!from || !to) return;
+    const k = 1 - t / 0.14;
+    const d = this.release.draw;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = alpha('#FFFFFF', 0.85 * k);
+    ctx.lineWidth = 1.5 + d * 2.5 * k;
+    ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(from.x + (to.x - from.x) * (0.3 + 0.7 * (1 - k)), from.y + (to.y - from.y) * (0.3 + 0.7 * (1 - k))); ctx.stroke();
+    ctx.strokeStyle = alpha('#FFFFFF', 0.5 * k);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(from.x, from.y, 6 + (1 - k) * (10 + d * 12), 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  /** The frame's rung, set by the host each frame: the bracket's colour. */
+  watchTone: WatchTone = 'UNSEEN';
+  /** 0..1, how locked the street's bracket is on the rider. */
+  private track = 0;
+  /** Seconds since a lens last acquired the rider; drives the tag. */
+  private trackT = 99;
+  private trackId: string | null = null;
+  /** Where the bracket last sat, so a lost lock opens where it was. */
+  private trackAt: { x: number; y: number; half: number } | null = null;
+
+  /**
+   * The title's bracket, in play (docs/52).
+   *
+   * While any lens has the rider, a bracket closes on them in the colour of
+   * the frame's rung — cyan in view, orange tracked, red live — and a fine
+   * line runs from the lens that has them to the kid, so the player can see
+   * *which* camera it is without reading the strip. The lens's name rides
+   * beside the bracket for a moment after it first acquires, then goes:
+   * the bracket says the rest. When the lens loses them the bracket opens
+   * out and fades — the system letting go. Nothing here is drawn unless
+   * `Sim.playerObserved` says a sensor really has them.
+   */
+  private drawTrack(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
+    const sim = this.sim;
+    if (this.overlaysHidden || this.titleWatch) { this.track = 0; this.trackAt = null; return; }
+    const seen = sim.playerObserved;
+    const reduce = this.settings.reduceMotion;
+    const lenses = seen ? sim.sensorsSeeingPlayer() : [];
+    const lens = lenses.length ? lenses.reduce((a, b) => (dist(a.data.pos, sim.player.pos) < dist(b.data.pos, sim.player.pos) ? a : b)) : null;
+    if (lens && lens.data.id !== this.trackId) { this.trackId = lens.data.id; if (this.track < 0.5) this.trackT = 0; }
+    this.trackT += dt;
+    this.track = reduce ? (seen ? 1 : 0) : clamp01(this.track + (seen ? dt / 0.28 : -dt / 0.5));
+    if (this.track <= 0.001) { this.trackAt = null; if (!seen) this.trackId = null; return; }
+    const tone = this.watchTone === 'UNSEEN' ? 'SPOTTED' : this.watchTone;
+    const cyan = this.settings.colourSafeMachine ? '#7FD3FF' : TECH.cyan;
+    const col = tone === 'UNDERWATCH' ? '#FF4A3D' : tone === 'TRACKED' ? TECH.orange : cyan;
+    const p = sim.player;
+    const foot = this.perspective.screenOf(eye, p.pos, p.z, this.w, this.h);
+    const head = this.perspective.screenOf(eye, p.pos, p.z + 1.8, this.w, this.h);
+    if (seen && foot && head) {
+      const cx = (foot.x + head.x) / 2, cy = (foot.y + head.y) / 2;
+      this.trackAt = { x: cx, y: cy, half: Math.max(20, Math.abs(foot.y - head.y) * 0.85) };
+    }
+    const at = this.trackAt;
+    if (!at) return;
+    const e = smoothstep(this.track);
+    // Closing in on acquire, opening out on loss: one motion either way.
+    const half = at.half * (1 + (1 - e) * 0.9);
+    const arm = Math.max(7, at.half * 0.34);
+    const a = seen ? e : e * e;
+    ctx.save();
+    // The lens's line to the kid: fine, dashed, from the housing.
+    if (seen && lens) {
+      const from = this.perspective.screenOf(eye, lens.data.pos, lens.data.height, this.w, this.h);
+      if (from) {
+        const dx = at.x - from.x, dy = at.y - from.y;
+        const l = Math.hypot(dx, dy) || 1;
+        const stop = Math.max(0, l - half * 1.1);
+        ctx.strokeStyle = alpha(col, 0.55 * a);
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([5, 5]);
+        ctx.lineDashOffset = reduce ? 0 : -this.trackT * 22;
+        ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(from.x + (dx / l) * stop, from.y + (dy / l) * stop); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = alpha(col, 0.9 * a);
+        ctx.fillRect(from.x - 2.5, from.y - 2.5, 5, 5);
+      }
+    }
+    // The bracket: a dark keyline under it so it holds on pale concrete.
+    for (const [c, w] of [[alpha('#0A1016', 0.45 * a), 4], [alpha(col, 0.95 * a), 2]] as const) {
+      ctx.strokeStyle = c;
+      ctx.lineWidth = w;
+      ctx.beginPath();
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as Array<[number, number]>) {
+        const x = at.x + sx * half * 0.78, y = at.y + sy * half;
+        ctx.moveTo(x, y - sy * arm); ctx.lineTo(x, y); ctx.lineTo(x - sx * arm, y);
+      }
+      ctx.stroke();
+    }
+    // The lens's name, briefly, after it first has them.
+    const tagA = seen ? clamp01((2.4 - this.trackT) / 0.5) * clamp01((this.trackT - 0.2) / 0.15) * a : 0;
+    if (tagA > 0.01 && this.trackId) {
+      const [l1, l2] = trackTag(this.trackId, tone);
+      ctx.font = '600 10px "IBM Plex Mono", ui-monospace, Menlo, monospace';
+      const wid = Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width) + 14;
+      const right = at.x + half * 0.78 + 8 + wid < this.w - 10;
+      const bx = right ? at.x + half * 0.78 + 8 : Math.max(10, at.x - half * 0.78 - 8 - wid);
+      const by = at.y - half;
+      ctx.fillStyle = alpha('#0A1016', 0.84 * tagA);
+      ctx.fillRect(bx, by, wid, 32);
+      ctx.fillStyle = alpha(col, tagA);
+      ctx.fillRect(right ? bx : bx + wid - 2, by, 2, 32);
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = alpha('#EEF3F6', 0.95 * tagA);
+      ctx.fillText(l1, bx + 7, by + 10);
+      ctx.fillStyle = alpha(col, tagA);
+      ctx.fillText(l2, bx + 7, by + 23);
+    }
+    ctx.restore();
+  }
+
   private drawMatchLock(ctx: CanvasRenderingContext2D, eye: CamState, dt: number): void {
     const m = this.matchLock;
     if (!m) return;
@@ -2022,6 +2316,39 @@ export class Renderer {
       }
     }
     const g = sim.grind;
+    /*
+     * The rail, heated (docs/52): from where the trucks bit to where they
+     * are now, the line glows the player's amber, brightest at the contact
+     * — so a grind reads as a grind, not a board floating near a bar.
+     */
+    if (g && this.grindLine !== g.line) { this.grindLine = g.line; this.grindFrom = { ...sim.player.pos }; }
+    if (!g) { this.grindLine = null; this.grindFrom = null; }
+    if (g && this.grindFrom) {
+      const l = g.line;
+      const z = l.z + 0.03;
+      const a = this.perspective.project3(eye, this.grindFrom.x, this.grindFrom.y, z, this.w, this.h);
+      const b = this.perspective.project3(eye, sim.player.pos.x, sim.player.pos.y, z, this.w, this.h);
+      if (a && b) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        grad.addColorStop(0, alpha(VENEER.player, 0));
+        grad.addColorStop(1, alpha('#FFE3A3', 0.95));
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = Math.max(2.5, Math.min(6, 0.1 * b.s));
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        // The contact: a hot point under the trucks, flickering.
+        const flick = this.settings.reduceMotion ? 1 : 0.75 + 0.25 * Math.sin(sim.time * 47);
+        const r = Math.max(4, Math.min(12, 0.22 * b.s)) * flick;
+        const glow = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, r);
+        glow.addColorStop(0, alpha('#FFFFFF', 0.95));
+        glow.addColorStop(0.35, alpha('#FFE3A3', 0.7));
+        glow.addColorStop(1, alpha(VENEER.player, 0));
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
     if (g) {
       this.sparkClock -= dt;
       if (this.sparkClock <= 0) {
@@ -2032,6 +2359,8 @@ export class Renderer {
     }
   }
   private sparkClock = 0;
+  private grindLine: unknown = null;
+  private grindFrom: Vec2 | null = null;
 
   /**
    * The aimer, with the sling raised: fixed in the middle of the glass,

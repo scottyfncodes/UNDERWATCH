@@ -212,19 +212,41 @@ export class ControlsRenderer {
        * flash — otherwise the only tell is a border at the edge of the screen,
        * a long way from the finger holding it open.
        */
-      const rim = on && secondary ? MACHINE.data : '#FFFFFF';
-      const rimAlpha = (on ? 0.92 : secondary ? 0.40 : 0.55) * a * dim;
+      /*
+       * Four states, each its own look (docs/52):
+       *   unavailable  dimmed, as before;
+       *   available    GRIND with a rail in reach: a thin amber ring outside
+       *                the disc, the same amber as the lit rail in the street;
+       *   active       the thing is happening — on the rail, the board
+       *                flipping, the sling raised: an amber rim and mark;
+       *   pressed      a thumb on it: the bright rim (PLAN's cyan).
+       */
+      const active = (b.id === 'grind' && this.live.grinding) || (b.id === 'trick' && this.live.trick) || (b.id === 'sling' && v.slingOut);
+      const available = b.id === 'grind' && b.enabled && !active;
+      const rim = active ? OWN : on && secondary ? MACHINE.data : '#FFFFFF';
+      const rimAlpha = (active ? 1 : on ? 0.92 : secondary ? 0.40 : 0.55) * a * dim;
       ctx.strokeStyle = alpha(rim, rimAlpha);
-      ctx.lineWidth = on ? 2.4 : secondary ? 1.3 : 1.8;
+      ctx.lineWidth = active ? 2.6 : on ? 2.4 : secondary ? 1.3 : 1.8;
       ctx.stroke();
+      if (available) {
+        ctx.strokeStyle = alpha(OWN, 0.7 * a);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(b.pos.x, b.pos.y, b.radius + 4, 0, Math.PI * 2); ctx.stroke();
+      }
 
-      ctx.fillStyle = alpha(on && secondary ? MACHINE.data : '#F6F4EE',
-        (on ? 1 : secondary ? 0.72 : 0.9) * a * dim);
+      ctx.fillStyle = alpha(active ? OWN : on && secondary ? MACHINE.data : '#F6F4EE',
+        (active || on ? 1 : secondary ? 0.72 : 0.9) * a * dim);
       this.raised = v.slingOut;
       this.glyph(ctx, b.id, b.pos.x, b.pos.y, b.radius);
     }
     ctx.restore();
   }
+
+  /**
+   * What the board is doing, set by the renderer each frame (docs/52), so a
+   * control can say "this is happening" and not only "you pressed me".
+   */
+  live = { grinding: false, trick: false };
 
   /** Whether the sling is raised, for SLING's label. */
   private raised = false;

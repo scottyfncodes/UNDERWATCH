@@ -61,6 +61,9 @@ export class ObservationFrame {
     this.pulse('scan');
   }
 
+  /** The rung of the ladder the frame is showing, for the street's bracket. */
+  get watching(): WatchState { return this.lastState === '' ? 'UNSEEN' : this.lastState; }
+
   /** 0..1: how hard the system is looking, for the sound of the town. */
   get watchLevel(): number {
     return this.held ? 1 : this.lastState === '' ? 0 : RANK[this.lastState] / 3;

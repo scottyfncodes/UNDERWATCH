@@ -32,6 +32,7 @@ import { TUNE as SKATE, type PlayerState } from '../sim/player';
 import { INK, Ink, brushOutline, hash01, inkAt, seedOf } from './ink';
 import { CITY_INK, LIGHT, PRINT, SIGNAL, SKY, TECH, VENEER, alpha, mix, shade, weather } from './palette';
 import { Tone, tone } from './tone';
+import { streetCones } from './watch';
 import { POLE_H, poleLineFor } from '../sim/traversal/poleLine';
 
 
@@ -294,6 +295,24 @@ export class ChaseCamera {
   /** How far over a wall the rig has had to lift, 0..1. */
   private crane = 0;
 
+  /**
+   * The rig answering the board (docs/52). A landing, a rail caught or a
+   * slam used to call the flat plan camera's shake, which is not drawn in
+   * the street — so in play nothing moved. Now the eye dips with the
+   * landing (the rider's knees taking it) and, for a hard hit, trembles.
+   * `k` is 0..1 and already scaled by the player's camera-shake setting.
+   */
+  bump(k: number, shake = 0): void {
+    if (k <= 0 && shake <= 0) return;
+    this.dipAmp = Math.max(this.dipAmp * Math.exp(-this.dipT * 6), k);
+    this.dipT = 0;
+    this.tremor = Math.max(this.tremor, shake);
+  }
+  private dipAmp = 0;
+  private dipT = 9;
+  private tremor = 0;
+  private tremorT = 0;
+
   /** Swing the camera round the rider by this many radians. */
   swing(radians: number): void {
     this.yaw = wrapAngle(this.yaw + radians);
@@ -331,6 +350,9 @@ export class ChaseCamera {
   get aiming(): boolean { return this.aimBlend > 0.5; }
 
   update(sim: Sim, dt: number): void {
+    this.dipT += dt;
+    this.tremor = Math.max(0, this.tremor - dt * 2.4);
+    this.tremorT += dt;
     this.aimBlend = damp(this.aimBlend, this.aimMode ? 1 : 0, 0.08, dt);
     // Aiming, the rig stays where the player put it rather than settling
     // back behind the board.
@@ -427,7 +449,9 @@ export class ChaseCamera {
      * few dozen pixels tall — the town read, the skating did not. Slow is when
      * the player is looking at the board; fast is when they need the road.
      */
-    const nearBase = lerp(36.0, 29.0, tall);
+    // (docs/52: 29 to 26.5 on an upright phone at rest — the kid read as a
+    // marker on the pad; at speed the rig still goes all the way out.)
+    const nearBase = lerp(36.0, 26.5, tall);
     const lowBase = lerp(17.0, 14.0, tall);
     const far = lerp(lerp(nearBase, 44.0, t), 20.0, f) * k * (1 - this.drawPull * 0.16);
     this.dist = damp(this.dist, far, 0.3, dt);
@@ -558,6 +582,18 @@ export class ChaseCamera {
         pitch: lerp(live.pitch, over.pitch, k),
       };
     }
+    // The dip: down fast as the wheels take it, back up over a third of a
+    // second. A slam adds a short tremor of the aim itself.
+    const t = this.dipT;
+    const dip = this.dipAmp * Math.sin(Math.min(1, t / 0.07) * Math.PI / 2) * Math.exp(-t * 7);
+    if (dip > 0.001 || this.tremor > 0.001) {
+      const q = this.tremor * this.tremor;
+      live = {
+        pos: { x: live.pos.x, y: live.pos.y, z: live.pos.z - dip * 0.9 },
+        yaw: live.yaw + Math.sin(this.tremorT * 41) * q * 0.012,
+        pitch: live.pitch - dip * 0.018 + Math.cos(this.tremorT * 53) * q * 0.01,
+      };
+    }
     if (!this.handoff) { this.lastState = live; return live; }
     const k = easeHandoff(this.handoff.t);
     const a = this.handoff.from;
@@ -678,6 +714,7 @@ export class PerspectiveRenderer {
     this.collectSurfaces(sim, cam);
     this.collectShadows(sim, cam);
     this.collectEvidence(sim, cam);
+    if (!firstPerson) this.collectWatch(sim, cam);
     this.inkAs = Ink.Building;
     this.collectBuildings(sim, cam);
     this.inkAs = Ink.Interactable;
@@ -948,6 +985,28 @@ export class PerspectiveRenderer {
       const hc = toCamera(cam, lamp.head.x, lamp.head.y, lamp.z);
       if (hc.z > NEAR + 0.5) {
         const hq = project(cam, hc);
+        /*
+         * The shaft (docs/52): the air under the housing, faintly lit, from
+         * the lamp down to its pool — the evening has some haze in it, and
+         * it is what makes a pool of light read as coming from somewhere.
+         */
+        // Not for a lamp right by the eye: up close the shaft is a wall of
+        // light across the glass, not haze in the distance.
+        if (hq.y < q.y - 6 && hc.z > 14 && rx < cam.w * 0.22) {
+          const top = Math.max(1.5, Math.min(6, (cam.f / hc.z) * 0.2));
+          const sh = ctx.createLinearGradient(hq.x, hq.y, q.x, q.y);
+          sh.addColorStop(0, alpha(LIGHT.lamp, 0.09 * k));
+          sh.addColorStop(0.6, alpha(LIGHT.lamp, 0.035 * k));
+          sh.addColorStop(1, alpha(LIGHT.lamp, 0));
+          ctx.fillStyle = sh;
+          // Twice, the inner narrower: a soft edge without a blur.
+          for (const wide of [0.55, 0.3]) {
+            ctx.beginPath();
+            ctx.moveTo(hq.x - top, hq.y); ctx.lineTo(hq.x + top, hq.y);
+            ctx.lineTo(q.x + rx * wide, q.y); ctx.lineTo(q.x - rx * wide, q.y);
+            ctx.closePath(); ctx.fill();
+          }
+        }
         const hr = Math.max(3, Math.min(26, (cam.f / hc.z) * 0.9));
         const b = ctx.createRadialGradient(hq.x, hq.y, 0, hq.x, hq.y, hr);
         b.addColorStop(0, alpha('#FFFFFF', 0.85 * k));
@@ -1514,6 +1573,57 @@ export class PerspectiveRenderer {
       }
       this.inkAs = was;
     }
+  }
+
+  /**
+   * What is watching, on the ground (watch.ts, docs/52).
+   *
+   * The footprint of each camera the player knows about, laid on the street
+   * under the grade so it is part of the evening rather than a sticker on
+   * the glass: a faint wash that falls off toward its reach, and its two
+   * edges ruled — firm once the recon has timed it, broken while it is only
+   * noticed. Cyan at rest, the player's amber while it is turned to a stone
+   * they threw, warning orange while it has them. Buildings stand on it, so
+   * a wall that blocks a lens visibly cuts its footprint off.
+   */
+  private collectWatch(sim: Sim, cam: Cam): void {
+    const cones = streetCones(sim);
+    if (cones.length === 0) return;
+    const was = this.inkAs;
+    this.inkAs = null;
+    const flat = (pts: Vec2[], fill: string, order: number) =>
+      this.push(cam, pts.map((q) => ({ x: q.x, y: q.y, z: 0.012 })), fill, undefined, undefined, Layer.Ground, order);
+    const SEG = 10;
+    for (const c of cones) {
+      const col = c.state === 'seeing' ? SIGNAL.warning : c.state === 'turned' ? SIGNAL.player : TECH.cyan;
+      const hot = c.state === 'seeing' ? 2.1 : c.state === 'turned' ? 1.4 : 1;
+      const at = (a: number, r: number): Vec2 => ({ x: c.pos.x + Math.cos(a) * r, y: c.pos.y + Math.sin(a) * r });
+      const a0 = c.facing - c.fov / 2;
+      // Two bands, the near one stronger: a falloff without a gradient.
+      for (const [r0, r1, k] of [[0, 0.55, 0.11], [0.55, 1, 0.055]] as const) {
+        const pts: Vec2[] = [];
+        for (let i = 0; i <= SEG; i++) pts.push(at(a0 + (c.fov * i) / SEG, c.reach * r1));
+        if (r0 === 0) pts.push({ x: c.pos.x, y: c.pos.y });
+        else for (let i = SEG; i >= 0; i--) pts.push(at(a0 + (c.fov * i) / SEG, c.reach * r0));
+        flat(pts, alpha(col, k * hot), 57);
+      }
+      // The edges: ruled when timed, broken when only noticed.
+      const edgeA = c.timed || c.state === 'seeing' ? 0.75 : 0.6;
+      for (const side of [-1, 1]) {
+        const a = c.facing + (side * c.fov) / 2;
+        const ux = Math.cos(a), uy = Math.sin(a), nx = -uy * 0.05, ny = ux * 0.05;
+        const runs = c.timed || c.state === 'seeing' ? [[0.04, 1]] : [[0.04, 0.2], [0.28, 0.44], [0.52, 0.68], [0.76, 0.92]];
+        for (const [t0, t1] of runs) {
+          const p0 = { x: c.pos.x + ux * c.reach * t0, y: c.pos.y + uy * c.reach * t0 };
+          const p1 = { x: c.pos.x + ux * c.reach * t1, y: c.pos.y + uy * c.reach * t1 };
+          // Tapering to nothing at its reach: a lens sees less, further out.
+          const f = 1 - t1 * 0.6;
+          flat([{ x: p0.x + nx, y: p0.y + ny }, { x: p1.x + nx * f, y: p1.y + ny * f }, { x: p1.x - nx * f, y: p1.y - ny * f }, { x: p0.x - nx, y: p0.y - ny }],
+            alpha(col, edgeA), 58);
+        }
+      }
+    }
+    this.inkAs = was;
   }
 
   /**
