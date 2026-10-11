@@ -183,8 +183,15 @@ export class JobBoard {
   private kitHtml(recs: Record<string, JobRecord>): string {
     const rep = repOf(recs);
     const perks = PERKS.map((p) => `<span class="perk${rep >= p.rep ? ' on' : ''}" title="${p.does}">
-      <b>${p.name}</b><small>${rep >= p.rep ? p.does : `REP ${p.rep}`}</small></span>`).join('');
-    return `<div class="jb-kit"><span class="jb-rep">REP <b>${rep}</b></span>${perks}</div>`;
+      <b>${rep >= p.rep ? '' : ICON.lock}${p.name}</b><small>${rep >= p.rep ? 'EQUIPPED' : `REP ${p.rep}`}</small></span>`).join('');
+    // How far to the next piece of kit, as a measured bar (docs/51).
+    const next = PERKS.find((p) => rep < p.rep);
+    const prev = [...PERKS].reverse().find((p) => rep >= p.rep)?.rep ?? 0;
+    const toward = next ? (rep - prev) / Math.max(1, next.rep - prev) : 1;
+    return `<div class="jb-kit">
+      <div class="jb-rep"><span>REP <b>${rep}</b></span><em>${next ? `${next.name} AT ${next.rep}` : 'ALL KIT'}</em>
+        <span class="jr-bar"><i style="width:${Math.round(toward * 100)}%"></i></span></div>
+      <div class="jb-perks">${perks}</div></div>`;
   }
 
   private briefHtml(j: JobDef, r: JobRecord | undefined): string {
@@ -325,7 +332,7 @@ export class JobHud {
     const m = run.lastMove;
     if (m && m.at !== this.toastAt) {
       this.toastAt = m.at;
-      this.toast.textContent = `+${num(m.points)}${m.multiplier > 1 ? ` ×${m.multiplier}` : ''} ${m.label}`;
+      this.toast.innerHTML = `<b>+${num(m.points)}</b>${m.multiplier > 1 ? `<i>×${m.multiplier}</i>` : ''}<span>${m.label}</span>`;
       this.toast.className = '';
       void this.toast.offsetWidth;
       this.toast.className = 'show';
@@ -371,22 +378,32 @@ export class JobResults {
     this.hasNext = hasNext;
     const best = (k: string) => (bests.includes(k) && rec.runs > 1 ? '<span class="nb">BEST</span>' : '');
     const k = this.touch ? '' : ' <kbd>';
+    // Bars only where a value has a scale of its own: time against the
+    // target, exposure and flow as shares. Style is a count and stays one.
+    const bar = (v: number, tone = '') => `<span class="jr-bar${tone}"><i style="width:${Math.round(Math.max(0, Math.min(1, v)) * 100)}%"></i></span>`;
+    const plural = (n: number, w: string) => `<span><b>${n}</b> ${w}${n === 1 ? '' : 's'}</span>`;
     this.el.innerHTML = `
       <div class="jr-card" role="dialog" aria-modal="true" aria-labelledby="jr-title">
         <div class="jb-eyebrow">${ICON.archive}JOB ${pad2(def.number)} · ${def.kind} · COMPLETE</div>
         <h2 id="jr-title" class="brief-title">${def.title}</h2>
-        <div class="jr-grade g-${r.grade}"><span class="jr-box"><b>${r.grade}</b></span>${r.ghost ? '<small>GHOST</small>' : ''}</div>
-        <div class="jr-total">${num(r.total)} ${best('total')}</div>
+        <div class="jr-hero">
+          <div class="jr-grade g-${r.grade}"><span class="jr-box"><b>${r.grade}</b></span></div>
+          <div class="jr-score">
+            <small>SCORE</small>
+            <div class="jr-total">${num(r.total)}</div>
+            <div class="jr-marks">${r.ghost ? '<span class="jr-mark ghost">GHOST</span>' : ''}${best('total') ? '<span class="jr-mark best">NEW BEST</span>' : ''}</div>
+          </div>
+        </div>
         <dl class="jr-stats">
           <div><dt>Style</dt><dd>${num(r.style)} ${best('style')}</dd></div>
-          <div><dt>Time</dt><dd>${fmtTime(r.time)} <small>/ ${fmtClock(def.target)}</small> ${best('time')}</dd></div>
-          <div><dt>Exposure</dt><dd>${pct(r.exposure)} ${best('exposure')}</dd></div>
-          <div><dt>Flow</dt><dd>${pct(r.flow)} ${best('flow')}</dd></div>
+          <div><dt>Time</dt><dd>${fmtTime(r.time)} <small>/ ${fmtClock(def.target)}</small> ${best('time')}</dd>${bar(def.target / Math.max(def.target, r.time))}</div>
+          <div><dt>Exposure</dt><dd>${pct(r.exposure)} ${best('exposure')}</dd>${bar(r.exposure, ' warn')}</div>
+          <div><dt>Flow</dt><dd>${pct(r.flow)} ${best('flow')}</dd>${bar(r.flow)}</div>
         </dl>
-        <p class="jr-line">${extra.grinds} grind${extra.grinds === 1 ? '' : 's'} · ${extra.tricks} trick${extra.tricks === 1 ? '' : 's'} · ${extra.airs} air${extra.airs === 1 ? '' : 's'} · best chain ${num(extra.bestChain)}${r.escapes ? ` · ${r.escapes} signal${r.escapes === 1 ? '' : 's'} lost` : ''}</p>
-        ${unlocked.map((p) => `<p class="jr-unlock"><span class="nb">NEW KIT</span> <b>${p.name}</b> — ${p.does}</p>`).join('')}
-        <p class="jr-best-line">Best: <b class="g-${rec.grade}">${rec.grade}</b> ${num(rec.total)} · ${fmtTime(rec.time)} · seen ${pct(rec.exposure)} · run ${rec.runs}</p>
-        <div class="brief-actions">
+        <p class="jr-line">${plural(extra.grinds, 'grind')}${plural(extra.tricks, 'trick')}${plural(extra.airs, 'air')}<span>chain <b>${num(extra.bestChain)}</b></span>${r.escapes ? plural(r.escapes, 'signal lost').replace('signal losts', 'signals lost') : ''}</p>
+        ${unlocked.map((p) => `<div class="jr-unlock"><span class="nb">NEW KIT</span><b>${p.name}</b><p>${p.does}</p></div>`).join('')}
+        <p class="jr-best-line">Best <b class="g-${rec.grade}">${rec.grade}</b> ${num(rec.total)} · ${fmtTime(rec.time)} · seen ${pct(rec.exposure)} · run ${rec.runs}</p>
+        <div class="brief-actions jr-actions">
           <button class="jb-go" data-act="retry">RUN IT AGAIN${k ? `${k}Enter</kbd>` : ''}</button>
           ${hasNext ? `<button class="jb-go quiet" data-act="next">NEXT JOB${k ? `${k}N</kbd>` : ''}</button>` : ''}
           <button class="jb-link" data-act="board">Job board${k ? `${k}Esc</kbd>` : ''}</button>

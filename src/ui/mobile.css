@@ -313,7 +313,8 @@ html.touch #inspect .verb.node { background: rgba(242, 245, 247, 0.07); }
  */
 @media (orientation: landscape) and (max-height: 520px) {
   #title { padding: calc(14px + var(--safe-top)) calc(22px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(26px + var(--safe-left)); }
-  #title .t-sys { top: calc(14px + var(--safe-top) + clamp(19px, 2.2vw, 30px) + 22px); left: calc(26px + var(--safe-left)); }
+  #title .st-title { font-size: 26px; gap: 9px; }
+  #title .t-sys { top: calc(14px + var(--safe-top) + 26px + 22px); left: calc(26px + var(--safe-left)); }
   #title .t-foot { width: min(300px, 40vw); gap: 8px; }
   #title .t-premise { font-size: 16px; margin-bottom: 4px; }
   #title .t-ride { min-height: 58px; font-size: 20px; padding: 8px 16px; }
