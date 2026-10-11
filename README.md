@@ -32,7 +32,9 @@ push a commit whose message contains `[update baselines]` (or run **Actions →
 Visual baselines**), and the workflow commits fresh ones. On failure, CI
 attaches expected/actual/diff images. `node scripts/flow-shots.mjs <dir>` (with
 `npm run dev` running) captures every screen with the town visible, for design
-passes. There is no WebKit in the cloud image, so the "iPhone" is Chromium with
+passes, and `node scripts/tour.mjs <dir>` walks the whole game — title, board,
+a run with a grind and the sling, the plan, results, being caught, the
+afternoon, notes and an ending. There is no WebKit in the cloud image, so the "iPhone" is Chromium with
 an iPhone's viewport, density, touch and user agent: right for layout, not a
 substitute for a real phone.
 
