@@ -23,10 +23,10 @@ export const KEYS: Array<[string, string]> = [
   ['W', 'push (hold to keep pushing)'], ['A D', 'carve'], ['Space', 'ollie (hold to load)'], ['S', 'brake / slide'],
   ['C', 'grind: on the ground it pops, in the air it catches the rail, ledge or bench under you'],
   ['R', 'trick'], ['G', 'grab'], ['Shift', 'step off the board'], ['Right mouse drag', 'look around'],
-  ['Left mouse', 'slingshot: drag back from anywhere and let go — or point at a thing and hold'],
+  ['Left mouse', 'slingshot: drag back from anywhere and let go, or point at a thing and hold'],
   ['F', 'steady aim: stand still and look down the sling (mouse or A D W S to aim)'],
   ['E', 'talk, look, reach into a node'], ['1–3', 'answer'],
-  ['Q', 'recon — open the plan, read what is in the middle, pin where you are going; Q again commits'], ['N', 'notes'], ['Esc', 'this menu'],
+  ['Q', 'recon: open the plan, read what is in the middle, pin where you are going; Q again commits'], ['N', 'notes'], ['Esc', 'this menu'],
   ['J', 'job board (in a job)'], ['T', 'restart the job (in a job)'],
   ['H', 'hold to see every control, without stopping'],
 ];

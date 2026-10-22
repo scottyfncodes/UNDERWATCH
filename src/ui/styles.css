@@ -95,7 +95,7 @@
   --st-risk: var(--risk);
 
   /* --- type ------------------------------------------------------------- */
-  --font-sans: Inter, "Helvetica Neue", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", "Helvetica Neue", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --fs-tech: 10px;                 /* readouts, stamps, tags: mono, tracked */
   --fs-eyebrow: 10.5px;            /* uppercase labels, tracked */

@@ -56,7 +56,7 @@ export const CLUES: ClueDef[] = [
   {
     id: 'c-match', thread: 'match', source: 'self', where: 'Every phone in the Channel',
     title: 'The match',
-    body: 'FACIAL MATCH CONFIRMED. 98.7%. ARAYA, DEVON M. A burglary in Northgate — and Devon was standing right next to me.',
+    body: 'FACIAL MATCH CONFIRMED. 98.7%. ARAYA, DEVON M. A burglary in Northgate, and Devon was standing right next to me.',
   },
   {
     id: 'c-cm207', thread: 'match', source: 'record', where: 'CM-207, Northgate Lane',
@@ -71,7 +71,7 @@ export const CLUES: ClueDef[] = [
   {
     id: 'c-predict', thread: 'match', source: 'record', where: 'SVC-PREDICT',
     title: 'The association',
-    body: "Devon's 'Northgate association' is 0.97 — forty-one visits to his cousin on Northgate Lane. The match score is the face weighted by that.",
+    body: "Devon's 'Northgate association' is 0.97: forty-one visits to his cousin on Northgate Lane. The match score is the face weighted by that.",
   },
   {
     id: 'c-review', thread: 'system', source: 'record', where: 'SVC-REVIEW',
@@ -92,28 +92,28 @@ export const CLUES: ClueDef[] = [
   {
     id: 'c-drainage', thread: 'where', source: 'record', where: 'CM-D01, the south Maple apron',
     title: 'The drainage log',
-    body: 'The drainage camera logged two subjects entering the Channel at 04:39:52 — SUBJECT 4417 and ARAYA, DEVON M. It never compared that with anything.',
+    body: 'The drainage camera logged two subjects entering the Channel at 04:39:52: SUBJECT 4417 and ARAYA, DEVON M. It never compared that with anything.',
   },
   // ------------------------------------------------------------------ burglary
   {
     id: 'c-autoreport', thread: 'burglary', source: 'place', where: "No. 14's front door",
     title: 'Reported on her behalf',
-    body: "The UNDERWATCH HOME panel by No. 14's door, still lit: 'UNRECOGNISED ADULT REMOVED AN ITEM FROM YOUR PORCH — 04:41. INCIDENT REPORTED ON YOUR BEHALF.'",
+    body: "The UNDERWATCH HOME panel by No. 14's door, still lit: 'UNRECOGNISED ADULT REMOVED AN ITEM FROM YOUR PORCH · 04:41. INCIDENT REPORTED ON YOUR BEHALF.'",
   },
   {
     id: 'c-resident', thread: 'burglary', source: 'person', where: 'Mrs. Carvalho, No. 14',
     title: 'Mrs. Carvalho',
-    body: "She didn't report anything — she was at work; the app did it. Nothing's missing. Except a parcel she's been waiting on all week.",
+    body: "She didn't report anything. She was at work; the app did it. Nothing's missing. Except a parcel she's been waiting on all week.",
   },
   {
     id: 'c-parcel', thread: 'burglary', source: 'place', where: "No. 16's front step",
     title: 'The parcel next door',
-    body: "On No. 16's step: a parcel addressed to 14 Northgate Lane. A courier's card taped on top — 'Tried 14. Secure address, no porch drops. Left with neighbour.'",
+    body: "On No. 16's step: a parcel addressed to 14 Northgate Lane. A courier's card taped on top: 'Tried 14. Secure address, no porch drops. Left with neighbour.'",
   },
   {
     id: 'c-alert', thread: 'burglary', source: 'place', where: 'The Vine Street shelter',
     title: 'The community alert',
-    body: "The bus shelter screen is running an UNDERWATCH CARE alert: Devon's school photo, PERSON OF INTEREST — NORTHGATE. Posted 04:43, to every phone on the Lane.",
+    body: "The bus shelter screen is running an UNDERWATCH CARE alert: Devon's school photo, PERSON OF INTEREST · NORTHGATE. Posted 04:43, to every phone on the Lane.",
   },
   {
     id: 'c-brennan', thread: 'burglary', source: 'person', where: 'Mr. Brennan, No. 12',
@@ -130,12 +130,12 @@ export const CLUES: ClueDef[] = [
   {
     id: 'c-mara', thread: 'system', source: 'person', where: 'Mara, Okonjo Cycle & Board',
     title: 'Where it all goes',
-    body: "Mara watched them fit Northgate's cameras. \"It all goes out through a cabinet at Relay 12 — the haulage yard off East Avenue. Nobody voted on any of it.\"",
+    body: "Mara watched them fit Northgate's cameras. \"It all goes out through a cabinet at Relay 12, the haulage yard off East Avenue. Nobody voted on any of it.\"",
   },
   {
     id: 'c-tx2', thread: 'system', source: 'record', where: 'TX-2, Relay 12',
     title: 'The shed',
-    body: 'TX-2 carries every frame Northgate takes. No storage, no matching, no decisions. Just carriage — 100% availability, 41 months.',
+    body: 'TX-2 carries every frame Northgate takes. No storage, no matching, no decisions. Just carriage: 100% availability, 41 months.',
   },
   {
     id: 'c-provision', thread: 'system', source: 'record', where: 'MT-R12, Relay 12',
@@ -152,12 +152,12 @@ export const CLUES: ClueDef[] = [
   {
     id: 'c-gallery', thread: 'system', source: 'place', where: 'The Ridgeline gate sign',
     title: 'Everyone at Ridgeline',
-    body: "The gallery is the whole school — 812, everyone enrolled, nobody opted out. On the sign, in biro: Kofi Mensah was brought in for a week last spring, and he still doesn't know what for.",
+    body: "The gallery is the whole school: 812, everyone enrolled, nobody opted out. On the sign, in biro: Kofi Mensah was brought in for a week last spring, and he still doesn't know what for.",
   },
   {
     id: 'c-flyer', thread: 'system', source: 'place', where: 'The Commons noticeboard',
     title: 'Last April',
-    body: "Under the leaflets, an older alert in the same layout as Devon's: PERSON OF INTEREST — COMMONS, last April. Someone scratched the face out. What's left of the name: '…ENSAH'.",
+    body: "Under the leaflets, an older alert in the same layout as Devon's: PERSON OF INTEREST · COMMONS, last April. Someone scratched the face out. What's left of the name: '…ENSAH'.",
   },
   {
     id: 'c-ledge', thread: 'system', source: 'place', where: 'The Channel, under the footbridge',
@@ -270,25 +270,25 @@ export interface PlaceText { text: string; clue?: string }
 
 export const PLACES: Record<string, PlaceText> = {
   'p-panel': {
-    text: "An UNDERWATCH HOME panel beside No. 14's door. The screen is still lit: 'UNRECOGNISED ADULT REMOVED AN ITEM FROM YOUR PORCH — 04:41. INCIDENT REPORTED ON YOUR BEHALF. Nothing more is needed from you.'",
+    text: "An UNDERWATCH HOME panel beside No. 14's door. The screen is still lit: 'UNRECOGNISED ADULT REMOVED AN ITEM FROM YOUR PORCH · 04:41. INCIDENT REPORTED ON YOUR BEHALF. Nothing more is needed from you.'",
     clue: 'c-autoreport',
   },
   'p-parcel': {
-    text: "A parcel on No. 16's step. It's addressed to 14 Northgate Lane. A courier's card is taped on top: 'Tried 14 — secure address, no porch drops. Left with neighbour.'",
+    text: "A parcel on No. 16's step. It's addressed to 14 Northgate Lane. A courier's card is taped on top: 'Tried 14. Secure address, no porch drops. Left with neighbour.'",
     clue: 'c-parcel',
   },
   'p-tape': {
-    text: "Tape across No. 14's drive: INCIDENT SCENE — UNDERWATCH CITY. There's nothing on the other side of it but a lawn.",
+    text: "Tape across No. 14's drive: INCIDENT SCENE · UNDERWATCH CITY. There's nothing on the other side of it but a lawn.",
   },
   'p-alert': {
-    text: "The shelter screen is running a community alert on a loop. Devon's school photo — the one with the bad haircut. PERSON OF INTEREST — NORTHGATE. Posted 04:43.",
+    text: "The shelter screen is running a community alert on a loop. Devon's school photo, the one with the bad haircut. PERSON OF INTEREST · NORTHGATE. Posted 04:43.",
     clue: 'c-alert',
   },
   'p-graffiti': {
-    text: "Sprayed along the channel wall, old and sun-faded: SMILE — YOU'RE PREDICTED. Someone's written underneath it, newer: not down here.",
+    text: "Sprayed along the channel wall, old and sun-faded: SMILE · YOU'RE PREDICTED. Someone's written underneath it, newer: not down here.",
   },
   'p-dropin': {
-    text: "An UNDERWATCH CARE poster on the noticeboard: COMMUNITY DROP-IN — TODAY, 5PM, BELLHAVEN COMMUNITY CENTRE. 'Meet Priya Venn, your Regional Operations lead. Your questions make us better.'",
+    text: "An UNDERWATCH CARE poster on the noticeboard: COMMUNITY DROP-IN · TODAY, 5PM, BELLHAVEN COMMUNITY CENTRE. 'Meet Priya Venn, your Regional Operations lead. Your questions make us better.'",
   },
   'p-enrol': {
     text: "A laminated sign on the school gate: 'All Ridgeline pupils are enrolled in UNDERWATCH SCHOOL. Opt-out forms are available from reception.' Someone's drawn a clock on it with the hands stuck at 'never'.",
@@ -341,7 +341,7 @@ export const SECOND_LOOKS: SecondLook[] = [
   },
   {
     id: 'sl-noticeboard', place: 'p-noticeboard', needs: 'c-alert', clue: 'c-flyer',
-    text: "You lift the CARE leaflet. Under it, sun-bleached, the same layout as the shelter screen: PERSON OF INTEREST — COMMONS. Last April. Somebody has scratched the face out with a key, carefully, like they were being kind. What's left of the name: '…ENSAH'.",
+    text: "You lift the CARE leaflet. Under it, sun-bleached, the same layout as the shelter screen: PERSON OF INTEREST · COMMONS. Last April. Somebody has scratched the face out with a key, carefully, like they were being kind. What's left of the name: '…ENSAH'.",
   },
   {
     id: 'sl-ledge', place: 'p-ledge', needs: 'c-gallery', clue: 'c-ledge',
@@ -349,7 +349,7 @@ export const SECOND_LOOKS: SecondLook[] = [
   },
   {
     id: 'sl-graffiti', place: 'p-graffiti', needs: 'd-alibi',
-    text: "SMILE — YOU'RE PREDICTED. And underneath: not down here. Except it was down here. The apron camera had the two of you at 04:39:52 the whole time. Nobody asked it.",
+    text: "SMILE · YOU'RE PREDICTED. And underneath: not down here. Except it was down here. The apron camera had the two of you at 04:39:52 the whole time. Nobody asked it.",
   },
   {
     id: 'sl-devon-board', place: 'p-devon-board', needs: 'd-posterior',
@@ -430,10 +430,10 @@ export const ENDINGS: Record<EndingId, Ending> = {
   review: {
     id: 'review',
     title: 'A Second Line',
-    system: 'INC-4100 RECLASSIFIED — MISATTRIBUTION UNDER REVIEW',
+    system: 'INC-4100 RECLASSIFIED · MISATTRIBUTION UNDER REVIEW',
     epilogue: [
       'Priya Venn opened a formal review that evening. She read every page of your notes, twice.',
-      "INC-4100 was reclassified: no offence, misattribution. Devon's record was not deleted — it can't be — but it has a second line now, under the first.",
+      "INC-4100 was reclassified: no offence, misattribution. Devon's record was not deleted (it can't be), but it has a second line now, under the first.",
       "The match threshold went back to 99% the following quarter. The petition that lowered it wasn't mentioned in the minutes.",
       "Devon still doesn't skate Northgate Lane. But he goes to his cousin's again.",
     ],
@@ -441,7 +441,7 @@ export const ENDINGS: Record<EndingId, Ending> = {
   noted: {
     id: 'noted',
     title: 'Your Concern Has Been Logged',
-    system: 'FEEDBACK RECEIVED — REFERENCE CX-20417',
+    system: 'FEEDBACK RECEIVED · REFERENCE CX-20417',
     epilogue: [
       'Priya Venn listened, and she was kind about it, and she logged it under reference CX-20417.',
       '"Association is not an accusation," she said. You could tell she believed it.',
@@ -452,7 +452,7 @@ export const ENDINGS: Record<EndingId, Ending> = {
   window: {
     id: 'window',
     title: 'The Window',
-    system: 'UNVERIFIED CLAIMS CIRCULATING — COMMUNITY GUIDANCE ISSUED',
+    system: 'UNVERIFIED CLAIMS CIRCULATING · COMMUNITY GUIDANCE ISSUED',
     epilogue: [
       "Mara put the whole thing in her window, in marker and printouts: the frame, the face, the drainage log, the parcel.",
       'By the weekend half of Bellhaven had stopped to read it. By the council meeting, 380 people had signed to put the threshold back to 99%.',
@@ -463,7 +463,7 @@ export const ENDINGS: Record<EndingId, Ending> = {
   rumour: {
     id: 'rumour',
     title: 'A Kid Defending His Friend',
-    system: 'MISINFORMATION ADVISORY — NORTHGATE',
+    system: 'MISINFORMATION ADVISORY · NORTHGATE',
     epilogue: [
       'Mara put your notes in her window. People read them the way people read a kid defending a friend.',
       "There were holes in it, and the holes were what got repeated. Mr. Brennan told anyone who'd listen that he'd seen the boy himself.",
@@ -477,7 +477,7 @@ export const ENDINGS: Record<EndingId, Ending> = {
     system: 'NO FURTHER ACTION',
     epilogue: [
       'You told Devon you would let it go, and you did.',
-      "His record says CONTACT 04:52 — NO FURTHER ACTION, and it will say that for the rest of his life, to anyone who's allowed to ask.",
+      "His record says CONTACT 04:52 · NO FURTHER ACTION, and it will say that for the rest of his life, to anyone who's allowed to ask.",
       'He was grateful. He meant it. The two of you never skate Northgate Lane again, and neither of you says why.',
       'The town is very safe. Everyone says so.',
     ],

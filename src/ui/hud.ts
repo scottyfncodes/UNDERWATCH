@@ -174,11 +174,11 @@ export class Hud {
     sim.bus.on('case:clue', ({ id }) => {
       const c = sim.casefile.clue(id);
       // The first note ever says where the notes are; nobody needs telling twice.
-      if (c) this.toast('NOTED', sim.casefile.clues.size === 1 ? `${c.title} — ${touch ? 'tap Notes' : 'N'} to read` : c.title, false);
+      if (c) this.toast('NOTED', sim.casefile.clues.size === 1 ? `${c.title} · ${touch ? 'tap Notes' : 'N'} to read` : c.title, false);
     });
     sim.bus.on('score:discovered', ({ score }) => {
       // Said once, as a thing found, in the same voice as a note.
-      this.toast('FOUND', `${PHONE.found} — ${score}, ${riskLabel(100 - score).toLowerCase()}`, true);
+      this.toast('FOUND', `${PHONE.found}: ${score}, ${riskLabel(100 - score).toLowerCase()}`, true);
       this.lastBand = riskLabel(sim.playerRisk);
     });
     sim.bus.on('case:deduction', ({ id }) => {
@@ -228,7 +228,7 @@ export class Hud {
     const choices = view.choices.length
       ? `<div class="choices">${view.choices.map((c, i) =>
         `<button class="choice" data-choice="${escapeHtml(c.id)}">${this.touch ? '' : `<kbd>${i + 1}</kbd>`}${escapeHtml(c.label)}</button>`).join('')}</div>`
-      : `<div class="next">${view.more ? `${key} ${ICON.chevron}` : `${key} — done`}</div>`;
+      : `<div class="next">${view.more ? `${key} ${ICON.chevron}` : `${key} · done`}</div>`;
     this.talk.innerHTML = `${who}<div class="said${view.kind === 'place' ? ' narration' : ''}">${escapeHtml(view.text)}</div>${choices}`;
     this.talk.classList.add('show');
   }

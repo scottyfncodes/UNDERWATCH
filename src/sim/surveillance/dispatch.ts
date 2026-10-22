@@ -210,7 +210,7 @@ export class Dispatcher {
             ? SYSTEM.searchingLastKnown
             : lvl === 'INTERVENTION'
               ? SYSTEM.interventionAuthorized
-              : `SUBJECT MONITORING — PREDICTIVE RISK ${Math.round(t.risk.total)}%`,
+              : `SUBJECT MONITORING · PREDICTIVE RISK ${Math.round(t.risk.total)}%`,
           issuedTick: tick,
           expiresTick: tick + (live ? (lvl === 'INTERVENTION' ? 60 * 40 : 60 * 22) : PURSUIT.searchRetaskTicks),
         };

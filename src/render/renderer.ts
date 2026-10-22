@@ -164,7 +164,7 @@ export class Renderer {
     ctx.save();
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '500 12.5px Inter, system-ui, sans-serif';
+    ctx.font = '500 12.5px "IBM Plex Sans", system-ui, sans-serif';
     const keep: typeof this.speech = [];
     for (const s of this.speech) {
       s.t += dt;
@@ -605,7 +605,7 @@ export class Renderer {
     // Street names, lettered along the longest straight run of each street,
     // upright whichever way the street goes. This is what the town says when
     // it tells you where something is: "CM-207 — Northgate Lane".
-    ctx.font = '600 10px Inter, system-ui, sans-serif';
+    ctx.font = '600 10px "IBM Plex Sans", system-ui, sans-serif';
     for (const st of sim.world.data.streets ?? []) {
       let best = -1, bi = 0;
       for (let i = 1; i < st.pts.length; i++) {
@@ -658,7 +658,7 @@ export class Renderer {
       ctx.strokeStyle = alpha('#0B1117', 0.8 * a);
       ctx.lineWidth = 1.5;
       ctx.stroke();
-      ctx.font = '600 11px Inter, system-ui, sans-serif';
+      ctx.font = '600 11px "IBM Plex Sans", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillStyle = alpha('#0B1117', 0.7 * a);
       const wd = ctx.measureText(label).width + 8;
@@ -870,7 +870,7 @@ export class Renderer {
       ctx.setLineDash([]);
       ctx.font = '700 10px ui-monospace, Menlo, monospace';
       ctx.fillStyle = alpha(col, 0.95 * a);
-      ctx.fillText(`${ar.district.toUpperCase()} — ${ar.level}`, c.x, c.y - 34 * cam.zoom - 8);
+      ctx.fillText(`${ar.district.toUpperCase()} · ${ar.level}`, c.x, c.y - 34 * cam.zoom - 8);
     }
 
     if (!vision) {
@@ -1863,7 +1863,7 @@ export class Renderer {
     ctx.beginPath(); ctx.arc(at.x, at.y, target.mono ? 13 : 10, 0, Math.PI * 2); ctx.stroke();
 
     const label = target.title;
-    ctx.font = target.mono ? '700 12px ui-monospace, Menlo, monospace' : '600 12.5px Inter, system-ui, sans-serif';
+    ctx.font = target.mono ? '700 12px ui-monospace, Menlo, monospace' : '600 12.5px "IBM Plex Sans", system-ui, sans-serif';
     const wid = Math.max(64, ctx.measureText(label).width + 22);
     const boxY = at.y - 42;
     ctx.fillStyle = alpha('#121A22', 0.82 * a);

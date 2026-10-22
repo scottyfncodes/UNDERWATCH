@@ -33,7 +33,7 @@ export const JOBS: JobDef[] = [
         { id: 'k2', label: 'EAST KICKER', pos: { x: 391, y: 215 }, radius: 6, air: 1.4 },
       ],
     }],
-    threat: 'None — until you are seen getting there', target: 45,
+    threat: 'None, until you are seen getting there', target: 45,
   },
   {
     id: 'job-01', number: 2, kind: 'COURIER', title: 'GET TO: OKONJO CYCLE & BOARD',
@@ -74,7 +74,7 @@ export const JOBS: JobDef[] = [
     threat: 'Plaza cameras', target: 60,
   },
   {
-    id: 'job-04', number: 5, kind: 'GHOST', title: 'GET TO: NORTHGATE PARADE — UNSEEN',
+    id: 'job-04', number: 5, kind: 'GHOST', title: 'GET TO: NORTHGATE PARADE · UNSEEN',
     brief: 'Nobody can know you were there. Rated on how little anything saw.',
     start: { label: 'Maple Court South', pos: { x: 155, y: 296 }, heading: N },
     stages: [{

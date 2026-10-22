@@ -179,7 +179,7 @@ export class MachineRenderer {
         this.label(ctx, origin, [
           d.id,
           s.state === 'ONLINE' ? d.label : s.state,
-          `SEG ${this.sim.network.get(d.nodeId)?.segmentId ?? '—'}`,
+          `SEG ${this.sim.network.get(d.nodeId)?.segmentId ?? '-'}`,
           // Made watchful by what has been happening near it.
           ...(s.vigilance > 0.15 ? [`VIGILANCE ${Math.round(s.vigilance * 100)}%`] : []),
         ], live ? m.data : '#8A939A', 0.6);
@@ -380,7 +380,7 @@ export class MachineRenderer {
 
     const tip = cam.toScreen(t.prediction[t.prediction.length - 1], w, h);
     this.label(ctx, tip, [
-      'FORECAST — 15 S',
+      'FORECAST · 15 S',
       `CONFIDENCE ${Math.round(t.predictionConfidence * 100)}%`,
       `ANOMALY ${Math.round(t.predictionError * 100)}%`,
     ], m.prediction, 0.68, m.confirm);

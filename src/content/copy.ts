@@ -26,38 +26,38 @@ export const SYSTEM = {
   unusualRoute: 'UNUSUAL ROUTE DETECTED',
   behaviouralAnomaly: 'BEHAVIORAL ANOMALY DETECTED',
   loitering: 'EXTENDED PRESENCE LOGGED',
-  reckless: 'VELOCITY ADVISORY — PEDESTRIAN ZONE',
+  reckless: 'VELOCITY ADVISORY · PEDESTRIAN ZONE',
   proximity: 'SUBJECT PROXIMATE TO OPEN INCIDENT',
-  evasive: 'INTERMITTENT COVERAGE — SUBJECT PRIORITISED',
+  evasive: 'INTERMITTENT COVERAGE · SUBJECT PRIORITISED',
   risk: (n: number) => `PREDICTIVE RISK: ${Math.round(n)}%`,
-  cameraOffline: (id: string) => `CAMERA OFFLINE — NODE ${id}`,
-  cameraFault: (id: string) => `ALIGNMENT FAULT — NODE ${id}`,
+  cameraOffline: (id: string) => `CAMERA OFFLINE · NODE ${id}`,
+  cameraFault: (id: string) => `ALIGNMENT FAULT · NODE ${id}`,
   impact: 'PROJECTILE IMPACT DETECTED',
   analysing: 'TRAJECTORY ANALYSIS IN PROGRESS',
   originEstimated: (m: number, dir: string, c: number) =>
-    `ORIGIN ESTIMATED — ${Math.round(m)} M ${dir} — CONFIDENCE ${Math.round(c)}%`,
+    `ORIGIN ESTIMATED · ${Math.round(m)} M ${dir} · CONFIDENCE ${Math.round(c)}%`,
   subjectSearch: 'SUBJECT SEARCH INITIATED',
-  subjectLinked: (id: string) => `SUBJECT LINKED — ${id}`,
-  originIndeterminate: 'ORIGIN INDETERMINATE — INCIDENT LOGGED',
-  droneDispatch: 'UNIT DISPATCHED — INVESTIGATING ANOMALY',
+  subjectLinked: (id: string) => `SUBJECT LINKED · ${id}`,
+  originIndeterminate: 'ORIGIN INDETERMINATE · INCIDENT LOGGED',
+  droneDispatch: 'UNIT DISPATCHED · INVESTIGATING ANOMALY',
   patrolDispatch: 'GROUND UNIT ROUTED TO PREDICTED POSITION',
   intervention: 'INTERVENTION AUTHORIZED',
-  interventionComplete: 'CONTACT LOGGED — RECORD UPDATED',
-  segmentDegraded: (id: string) => `SEGMENT ${id} DEGRADED — CACHED MODE`,
-  integrityFail: (id: string) => `INTEGRITY CHECK FAILED — NODE ${id}`,
-  tamperLogged: 'TAMPER EVENT LOGGED — RETROACTIVE REVIEW',
-  noiseAnomaly: 'AUDIO ANOMALY — UNATTRIBUTED',
+  interventionComplete: 'CONTACT LOGGED · RECORD UPDATED',
+  segmentDegraded: (id: string) => `SEGMENT ${id} DEGRADED · CACHED MODE`,
+  integrityFail: (id: string) => `INTEGRITY CHECK FAILED · NODE ${id}`,
+  tamperLogged: 'TAMPER EVENT LOGGED · RETROACTIVE REVIEW',
+  noiseAnomaly: 'AUDIO ANOMALY · UNATTRIBUTED',
   /** A few stones in the same place is a pattern, and patterns get a visit. */
-  droneFault: 'UNIT FAULT — ENGINEER NOTIFIED',
-  recordImmutable: 'REQUEST DECLINED — RECORD IMMUTABLE',
+  droneFault: 'UNIT FAULT · ENGINEER NOTIFIED',
+  recordImmutable: 'REQUEST DECLINED · RECORD IMMUTABLE',
   retention: 'RETENTION POLICY: INDEFINITE',
   matchConfirmed: 'FACIAL MATCH CONFIRMED',
   matchConfidence: (n: number) => `${n.toFixed(1)}% CONFIDENCE`,
   matchSubject: (name: string) => `SUBJECT: ${name}`,
-  incidentReported: (kind: string, where: string) => `${kind} REPORTED — ${where}`,
-  maskActive: 'IDENTITY UNRESOLVED — SUBJECT UNKNOWN',
+  incidentReported: (kind: string, where: string) => `${kind} REPORTED · ${where}`,
+  maskActive: 'IDENTITY UNRESOLVED · SUBJECT UNKNOWN',
   /** SUPPRESS ran: the track it was holding went soft. */
-  trackSuppressed: 'TRACK CONFIDENCE DEGRADED — REACQUIRING',
+  trackSuppressed: 'TRACK CONFIDENCE DEGRADED · REACQUIRING',
   identityUnresolved: 'IDENTITY UNRESOLVED',
   holdStill: 'COME TO A STOP TO INTERFERE',
   /**
@@ -68,12 +68,12 @@ export const SYSTEM = {
    * now a control the player has had since the first frame; what changes here
    * is what is drawn inside it. So the line names the content, not a key.
    */
-  visionAvailable: 'UNDERWATCH VISION — SUBJECT LAYER ENABLED',
+  visionAvailable: 'UNDERWATCH VISION · SUBJECT LAYER ENABLED',
   /** The plan view's own caption, before there is anything else to say. */
   planView: 'PLAN VIEW',
   queryAvailable: 'QUERY AND TRACE AVAILABLE',
   interventionAuthorized: 'INTERVENTION AUTHORIZED',
-  loopActive: (id: string) => `NODE ${id} — FEED NOMINAL`,
+  loopActive: (id: string) => `NODE ${id} · FEED NOMINAL`,
   /*
    * The pursuit says out loud what it does and does not know.
    *
@@ -90,21 +90,21 @@ export const SYSTEM = {
    * told had started. These two are the other half of that set: the first is
    * somebody being sent to where you are, the second to where you were.
    */
-  unitDispatched: 'UNIT DISPATCHED — SUBJECT LOCATION',
-  unitResponding: 'UNIT RESPONDING — LAST REPORTED LOCATION',
-  contactLost: 'VISUAL CONTACT LOST — LAST KNOWN POSITION HELD',
-  searchingLastKnown: 'UNITS SEARCHING — LAST KNOWN POSITION',
-  pursuitCleared: 'SUBJECT NOT LOCATED — SEARCH STOOD DOWN',
+  unitDispatched: 'UNIT DISPATCHED · SUBJECT LOCATION',
+  unitResponding: 'UNIT RESPONDING · LAST REPORTED LOCATION',
+  contactLost: 'VISUAL CONTACT LOST · LAST KNOWN POSITION HELD',
+  searchingLastKnown: 'UNITS SEARCHING · LAST KNOWN POSITION',
+  pursuitCleared: 'SUBJECT NOT LOCATED · SEARCH STOOD DOWN',
   /*
    * A bearing hit somebody. UNDERWATCH does not say "you hurt them", because
    * nobody was hurt and the system would not care if they had been. It logs an
    * incident against a subject, which is the only language it has.
    */
-  personStruck: 'INCIDENT — OBJECT THROWN AT A PERSON',
+  personStruck: 'INCIDENT · OBJECT THROWN AT A PERSON',
   witnessed: (n: number) => n > 0
     ? `${n} WITNESS${n === 1 ? '' : 'ES'} IN RANGE. STATEMENTS REQUESTED.`
     : 'NO WITNESS STATEMENTS. FOOTAGE UNDER REVIEW.',
-  incidentPerson: 'PUBLIC ORDER — PROJECTILE, PERSON',
+  incidentPerson: 'PUBLIC ORDER · PROJECTILE, PERSON',
   /*
    * Disturbance: the system noticing a place rather than a person.
    *
@@ -112,25 +112,25 @@ export const SYSTEM = {
    * looking for — only that something keeps happening here. The player is
    * meant to read them as "I have been making too much noise on this street".
    */
-  areaNoticed: (where: string) => `RECURRING ACTIVITY — ${where}`,
-  areaPattern: (where: string) => `PATTERN DETECTED — ${where}`,
-  areaReview: (where: string) => `AREA UNDER REVIEW — ${where} — COVERAGE INCREASED`,
-  areaCleared: (where: string) => `AREA REVIEW CLOSED — ${where}`,
+  areaNoticed: (where: string) => `RECURRING ACTIVITY · ${where}`,
+  areaPattern: (where: string) => `PATTERN DETECTED · ${where}`,
+  areaReview: (where: string) => `AREA UNDER REVIEW · ${where} · COVERAGE INCREASED`,
+  areaCleared: (where: string) => `AREA REVIEW CLOSED · ${where}`,
   /** A noise in a place that has had too many: it looks back up the throw instead. */
-  noiseDiscounted: 'REPEAT ACOUSTIC EVENT — ORIGIN REVIEW',
+  noiseDiscounted: 'REPEAT ACOUSTIC EVENT · ORIGIN REVIEW',
   /** A broken node gets a visit. */
-  nodeInspect: (id: string) => `NODE ${id} DOWN — UNIT INSPECTING`,
+  nodeInspect: (id: string) => `NODE ${id} DOWN · UNIT INSPECTING`,
   /** Heavy physical evidence nobody could be linked to: it is still an incident. */
-  incidentVandalism: 'DEVICE DAMAGE — PERSON UNKNOWN',
+  incidentVandalism: 'DEVICE DAMAGE · PERSON UNKNOWN',
   /** The player spoke up at the stop, and is now part of the record of it. */
-  partyPresent: 'PARTY PRESENT LOGGED — SUBJECT 4417 — INC-4100',
+  partyPresent: 'PARTY PRESENT LOGGED · SUBJECT 4417 · INC-4100',
   /** The one line the system has about how the afternoon ended. */
   ending: {
-    review: 'INC-4100 RECLASSIFIED — MISATTRIBUTION UNDER REVIEW',
-    noted: 'FEEDBACK RECEIVED — REFERENCE CX-20417',
-    window: 'UNVERIFIED CLAIMS CIRCULATING — COMMUNITY GUIDANCE ISSUED',
-    rumour: 'MISINFORMATION ADVISORY — NORTHGATE',
-    dropped: 'INC-4100 — NO FURTHER ACTION',
+    review: 'INC-4100 RECLASSIFIED · MISATTRIBUTION UNDER REVIEW',
+    noted: 'FEEDBACK RECEIVED · REFERENCE CX-20417',
+    window: 'UNVERIFIED CLAIMS CIRCULATING · COMMUNITY GUIDANCE ISSUED',
+    rumour: 'MISINFORMATION ADVISORY · NORTHGATE',
+    dropped: 'INC-4100 · NO FURTHER ACTION',
   } as Record<'review' | 'noted' | 'window' | 'rumour' | 'dropped', string>,
 };
 
@@ -171,10 +171,10 @@ export const AD_SCRIPT: AdBeat[] = [
 
 export const AD_REPRISE_ANNOTATIONS: Record<number, string> = {
   0: '11,204 RESIDENTS ENROLLED',
-  1: '3,880 HOUSEHOLD NODES — AUDIO AND VIDEO',
+  1: '3,880 HOUSEHOLD NODES · AUDIO AND VIDEO',
   2: 'PREDICTIVE RISK COMPUTED CONTINUOUSLY FOR ALL SUBJECTS',
   3: '812 ENROLLED MINORS IN IDENTITY GALLERY',
-  4: 'FORECAST HORIZON: 15 SECONDS — ROAD GRAPH',
+  4: 'FORECAST HORIZON: 15 SECONDS · ROAD GRAPH',
   5: 'RETENTION: INDEFINITE',
 };
 
@@ -223,8 +223,8 @@ export const DIALOGUE = {
   ],
   devonWhere: "Devon (text): where are you. i'm at the bottom of maple court, on the kerb by the close.",
   devonNudge: "Devon: you coming or what? channel's south. past the greenway, down the apron.",
-  devonAtStop: "Devon: you didn't have to— ...the camera on the apron. the light came on when we went down. it saw us. remember that.",
-  maraText: 'Mara (text): heard about Devon. come by the shop if you want to know how it works. — M',
+  devonAtStop: "Devon: you didn't have to... the camera on the apron. the light came on when we went down. it saw us. remember that.",
+  maraText: 'Mara (text): heard about Devon. come by the shop if you want to know how it works. -M',
   sableLane: [
     "Devon: the lane behind the terraces. nobody's ever put a light back there.",
     "Devon: it thinks you're still on the road.",
@@ -251,14 +251,14 @@ export const PHONE = {
   record: (subject: string, n: number, band: string) => `HOLDING ${subject} · COMMUNITY SAFETY SCORE ${n} · ${band}`,
   /** The moment of finding it, as a note. */
   found: 'UNDERWATCH keeps a number on you',
-  foundDetail: (n: number, band: string) => `Community Safety Score ${n} — ${band}`,
+  foundDetail: (n: number, band: string) => `Community Safety Score ${n} · ${band}`,
   /** When it moves between bands, once found: small, and gone. */
   moved: (n: number, band: string) => `Community Safety Score ${n} · ${band}`,
   /** On the plan, once found. */
   plan: (n: number, band: string) => `UNDERWATCH HAS YOU AT ${n} · ${band}`,
   /** In the notes, in the player's own words. */
   notes: (n: number, band: string, where: string) =>
-    `UNDERWATCH has a number on me. It calls it my "Community Safety Score". Found it ${where === 'the plan' ? 'on the plan' : `in ${where}'s record`}. Right now it says ${n} — ${band.toLowerCase()}. Higher is better, apparently. Nobody asked me.`,
+    `UNDERWATCH has a number on me. It calls it my "Community Safety Score". Found it ${where === 'the plan' ? 'on the plan' : `in ${where}'s record`}. Right now it says ${n}: ${band.toLowerCase()}. Higher is better, apparently. Nobody asked me.`,
 };
 
 /**
@@ -330,14 +330,14 @@ export const RECON_COPY = {
   blown: 'PLAN BLOWN',
   /** Why, in a line: always something the recon could have shown. */
   reason: {
-    unscouted: (id: string) => `${id} — NOT IN YOUR RECON`,
-    mistimed: (id: string) => `${id} SWUNG BACK — MISTIMED`,
+    unscouted: (id: string) => `${id} · NOT IN YOUR RECON`,
+    mistimed: (id: string) => `${id} SWUNG BACK · MISTIMED`,
     unturned: (id: string) => `${id} WAS NEVER TURNED`,
     turning: (id: string) => `${id} HADN'T TURNED YET`,
-    woreOff: (id: string) => `${id} TURNED BACK — TOO SLOW`,
+    woreOff: (id: string) => `${id} TURNED BACK · TOO SLOW`,
     lookedBack: (id: string) => `${id} LOOKED BACK UP THE THROW`,
     inCone: (id: string) => `${id} NEVER LOOKS AWAY`,
-    offRoute: (id: string) => `${id} — OFF YOUR WAY`,
+    offRoute: (id: string) => `${id} · OFF YOUR WAY`,
   } as Record<string, (id: string) => string>,
   /** Live, on the strip, for the step being executed. */
   live: {
@@ -360,11 +360,11 @@ export const RECON_COPY = {
  */
 export const PLAN_READ = {
   inView: 'A CAMERA HAS YOU IN VIEW',
-  seenBy: (ids: string[]) => `IN VIEW — ${ids.slice(0, 3).join(', ')}`,
+  seenBy: (ids: string[]) => `IN VIEW · ${ids.slice(0, 3).join(', ')}`,
   area: (level: string, vision: boolean): string => {
     if (vision) {
-      return level === 'REVIEW' ? 'THIS AREA: UNDER REVIEW — COVERAGE INCREASED'
-        : level === 'PATTERN' ? 'THIS AREA: PATTERN — NOISE NO LONGER TRUSTED'
+      return level === 'REVIEW' ? 'THIS AREA: UNDER REVIEW · COVERAGE INCREASED'
+        : level === 'PATTERN' ? 'THIS AREA: PATTERN · NOISE NO LONGER TRUSTED'
           : 'THIS AREA: RECURRING ACTIVITY LOGGED';
     }
     return level === 'REVIEW' ? 'THIS STREET IS ON EDGE'

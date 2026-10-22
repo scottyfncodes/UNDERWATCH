@@ -66,10 +66,10 @@ export function authorNorthgate(b: TownBuilder): void {
   b.camera({
     id: 'CM-207', pos: pt(145, 88), facing: 270, kind: 'street',
     fov: 80, range: 34, sweep: 22, sweepPeriod: 13, height: 4.6, bias: 0.97,
-    label: 'NORTHGATE LN / VINE — STREET',
+    label: 'NORTHGATE LN / VINE · STREET',
     records: [
       'FEED: NOMINAL',
-      'NO FAULT RECORDED — 411 DAYS',
+      'NO FAULT RECORDED · 411 DAYS',
       'FRAME 04:41:07 CAPTURED, RELAYED VIA JX-207',
       'SERVICES: SVC-VISION, SVC-PREDICT',
     ],
@@ -85,7 +85,7 @@ export function authorNorthgate(b: TownBuilder): void {
   b.junction(pt(112, 88), 'NORTHGATE JUNCTION', 'JX-207', (ctx) => {
     const seg = ctx.network.segments.find((s) => s.id === 'S-N2');
     return [
-      `SEGMENT S-N2 — ${seg?.nodeIds.length ?? 0} NODES, ALL CARRIED BY THIS RELAY`,
+      `SEGMENT S-N2 · ${seg?.nodeIds.length ?? 0} NODES, ALL CARRIED BY THIS RELAY`,
       'FRAME 04:41:07 DELIVERED TO SVC-VISION IN 240 MS',
       'NO RETRANSMISSION, NO LOSS, NO DEGRADATION',
       'SELF-HEAL: 90S',
@@ -95,19 +95,19 @@ export function authorNorthgate(b: TownBuilder): void {
   b.link('CM-207', 'SVC-VISION');
   b.link('CM-207', 'SVC-PREDICT');
   b.link('JX-207', 'TX-2');
-  b.plateReader(pt(222, 62), 'NORTHGATE LN — PLATE READER');
+  b.plateReader(pt(222, 62), 'NORTHGATE LN · PLATE READER');
 
   // Two street cameras, half a cycle out of phase, so the seam between them
   // travels. Learning where it is at a given moment is the whole skill.
   b.camera({
     pos: pt(44, 50), facing: 22, kind: 'street', fov: 76, range: 34,
     sweep: 26, sweepPeriod: 11, sweepPhase: 0, height: 4.4, bias: 0.94,
-    label: 'NORTHGATE LN — WEST',
+    label: 'NORTHGATE LN · WEST',
   });
   b.camera({
     pos: pt(212, 50), facing: 158, kind: 'street', fov: 76, range: 34,
     sweep: 26, sweepPeriod: 11, sweepPhase: 0.5, height: 4.4, bias: 0.94,
-    label: 'NORTHGATE LN — EAST',
+    label: 'NORTHGATE LN · EAST',
   });
 
   // ------------------------------------------------------------- the terraces
@@ -129,19 +129,19 @@ export function authorNorthgate(b: TownBuilder): void {
   // --------------------------------------------------- the parade and the yard
   b.rectSurface(222, 36, 30, 46, 'roughConcrete', 1, true);
   b.building('shop', [pt(226, 40), pt(248, 40), pt(248, 58), pt(226, 58)], {
-    height: 6.2, wall: BRICK, roof: ROOF_SLATE, label: 'NORTHGATE PARADE — GROCER',
+    height: 6.2, wall: BRICK, roof: ROOF_SLATE, label: 'NORTHGATE PARADE · GROCER',
   });
   b.building('shop', [pt(226, 62), pt(248, 62), pt(248, 78), pt(226, 78)], {
-    height: 6.0, wall: WALL_COOL, roof: ROOF_SAND, label: 'NORTHGATE PARADE — LAUNDERETTE',
+    height: 6.0, wall: WALL_COOL, roof: ROOF_SAND, label: 'NORTHGATE PARADE · LAUNDERETTE',
   });
   b.cover([pt(222, 58), pt(248, 58), pt(248, 62), pt(222, 62)], 'awning', 3.4);
   b.camera({
     pos: pt(224, 49), facing: 180, kind: 'street', fov: 70, range: 24,
-    height: 4.2, bias: 0.9, label: 'NORTHGATE PARADE — SHOPFRONT',
+    height: 4.2, bias: 0.9, label: 'NORTHGATE PARADE · SHOPFRONT',
   });
   b.camera({
     pos: pt(224, 70), facing: 180, kind: 'doorbell', fov: 84, range: 16,
-    height: 2.6, bias: 0.86, label: 'NORTHGATE PARADE — SERVICE DOOR',
+    height: 2.6, bias: 0.86, label: 'NORTHGATE PARADE · SERVICE DOOR',
   });
   b.prop('bin', pt(232, 60)); b.prop('bin', pt(240, 60));
   b.ammoCache(pt(236, 84), 'NORTHGATE PARADE');
@@ -152,7 +152,7 @@ export function authorNorthgate(b: TownBuilder): void {
    * together, and knowing which junction serves which is worth more than
    * knocking either one down.
    */
-  b.segment('S-N3', 'TX-2', 'NORTHGATE — REAR SERVICE');
+  b.segment('S-N3', 'TX-2', 'NORTHGATE · REAR SERVICE');
   b.rectSurface(224, 14, 28, 24, 'gravel', 2);
   b.building('utility', [pt(228, 18), pt(246, 18), pt(246, 32), pt(228, 32)], {
     height: 4.0, wall: '#D8D3C4', roof: '#9AA0A6', label: 'NORTHGATE SUBSTATION',
@@ -164,9 +164,9 @@ export function authorNorthgate(b: TownBuilder): void {
   b.camera({
     pos: pt(226, 16), facing: 45, kind: 'facility', fov: 70, range: 24,
     sweep: 26, sweepPeriod: 8, height: 4.4, bias: 0.88,
-    label: 'SUBSTATION — PERIMETER',
+    label: 'SUBSTATION · PERIMETER',
   });
-  b.prop('sign', pt(226, 12), 0, { tint: 'UNDERWATCH CITY — RESTRICTED' });
+  b.prop('sign', pt(226, 12), 0, { tint: 'UNDERWATCH CITY · RESTRICTED' });
 
   // ------------------------------------------------------------- Sable Lane
   /*
@@ -189,10 +189,10 @@ export function authorNorthgate(b: TownBuilder): void {
   b.cover([pt(166, 100), pt(186, 100), pt(186, 110), pt(166, 110)], 'carport', 3.2);
 
   b.building('shed', [pt(60, 116), pt(140, 116), pt(140, 121), pt(60, 121)], {
-    height: 2.8, wall: '#C6BFAE', roof: '#8B7355', label: 'LOCK-UPS 1—9',
+    height: 2.8, wall: '#C6BFAE', roof: '#8B7355', label: 'LOCK-UPS 1–9',
   });
   b.building('shed', [pt(152, 116), pt(214, 116), pt(214, 121), pt(152, 121)], {
-    height: 2.8, wall: '#C6BFAE', roof: '#8B7355', label: 'LOCK-UPS 10—16',
+    height: 2.8, wall: '#C6BFAE', roof: '#8B7355', label: 'LOCK-UPS 10–16',
   });
 
   // The one camera that watches the alley itself, and the one that watches the
@@ -201,7 +201,7 @@ export function authorNorthgate(b: TownBuilder): void {
   b.useSegment('S-N3');
   b.camera({
     pos: pt(111, 115), facing: 270, kind: 'facility', fov: 70, range: 12,
-    height: 3.4, bias: 0.80, label: 'SABLE LANE — MID',
+    height: 3.4, bias: 0.80, label: 'SABLE LANE · MID',
   });
   // Angled across the mouth rather than straight down the lane, so it covers
   // both the way in and a stretch of the run — and sweeps between them, which
@@ -209,7 +209,7 @@ export function authorNorthgate(b: TownBuilder): void {
   b.camera({
     pos: pt(222, 104), facing: 125, kind: 'facility', fov: 60, range: 26,
     sweep: 24, sweepPeriod: 9, height: 4.0, bias: 0.72,
-    label: 'SABLE LANE — EAST ACCESS',
+    label: 'SABLE LANE · EAST ACCESS',
   });
 
   // The bus shelter on Vine, watching where the alley crosses the street. The
@@ -219,9 +219,9 @@ export function authorNorthgate(b: TownBuilder): void {
   });
   b.camera({
     pos: pt(75, 104), facing: 150, kind: 'street', fov: 70, range: 24,
-    height: 3.8, bias: 0.88, label: 'VINE ST — SHELTER',
+    height: 3.8, bias: 0.88, label: 'VINE ST · SHELTER',
   });
-  b.speaker(pt(84, 97), 'VINE ST — PUBLIC ADDRESS');
+  b.speaker(pt(84, 97), 'VINE ST · PUBLIC ADDRESS');
 
   b.useSegment('S-N2');
   b.building('civic', [pt(20, 66), pt(32, 66), pt(32, 80), pt(20, 80)], {
