@@ -27,7 +27,7 @@ describe('authoring guardrails fail on bad content', () => {
     const d = clone();
     // Drop a shed directly in front of the alley camera, the way a bus shelter
     // once sat in front of its own camera.
-    const cam = d.sensors.find((s) => s.label === 'SABLE LANE — MID')!;
+    const cam = d.sensors.find((s) => s.label === 'SABLE LANE · MID')!;
     d.buildings.push({
       id: 'TEST-BOX', kind: 'shed', height: 4, wall: '#fff', roof: '#fff',
       district: 'northgate', nodeIds: [],

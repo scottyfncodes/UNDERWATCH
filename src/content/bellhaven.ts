@@ -62,7 +62,7 @@ export function buildBellhaven(): WorldData {
   // On the outside of the hall's west wall, where a carrier cabinet actually
   // lives. Inside the building it was scenery; on the wall it is a thing you
   // can walk up to and read, which is the only interaction it will ever have.
-  b.uplink('TX-2', pt(494.2, 216), 'RELAY 12 — DISTRICT UPLINK', TX2_RECORDS);
+  b.uplink('TX-2', pt(494.2, 216), 'RELAY 12 · DISTRICT UPLINK', TX2_RECORDS);
 
   /*
    * The six records the investigation walks, in causal order:
@@ -76,39 +76,39 @@ export function buildBellhaven(): WorldData {
    *
    * Nobody in that chain did anything wrong. That is the argument.
    */
-  b.service('SVC-VISION', 'UNDERWATCH VISION — IDENTITY RECOGNITION', pt(392, 74), [
+  b.service('SVC-VISION', 'UNDERWATCH VISION · IDENTITY RECOGNITION', pt(392, 74), [
     'GALLERY: BELLHAVEN RESIDENTS (11,204)',
-    'GALLERY: RIDGELINE SECONDARY — ENROLLED MINORS (812)',
+    'GALLERY: RIDGELINE SECONDARY · ENROLLED MINORS (812)',
     'CONSENT BASIS: PARENT / GUARDIAN, UNDERWATCH SCHOOL T&C 4.2',
     'MATCH THRESHOLD: 97.0%',
-    'FRAME 04:41:07 — FACE PARTIALLY OCCLUDED (HOOD), 34 DEG OFF AXIS',
+    'FRAME 04:41:07 · FACE PARTIALLY OCCLUDED (HOOD), 34 DEG OFF AXIS',
     'RAW FACIAL SIMILARITY, ARAYA D.: 61.2%',
     'SCORE WEIGHTED BY SVC-PREDICT ASSOCIATION',
-    'THRESHOLD LAST REVISED: LOWERED FROM 99.0% — SEE REVIEW 11-04',
-    'MATCH 04:41:07 — ARAYA, DEVON M. — 98.7%',
+    'THRESHOLD LAST REVISED: LOWERED FROM 99.0% · SEE REVIEW 11-04',
+    'MATCH 04:41:07 · ARAYA, DEVON M. · 98.7%',
   ]);
-  b.service('SVC-REVIEW', 'UNDERWATCH GOVERNANCE — REVIEW 11-04', pt(392, 66), [
+  b.service('SVC-REVIEW', 'UNDERWATCH GOVERNANCE · REVIEW 11-04', pt(392, 66), [
     'PETITIONED BY: BELLHAVEN SCHOOL COUNCIL (PARENTS, 214 SIGNATURES)',
     'CHANGE: MATCH THRESHOLD 99.0% -> 97.0%',
     'RATIONALE: TWO HARMS PREVENTED IN PILOT QUARTER',
     'FALSE POSITIVE RATE: +340%',
     'FALSE POSITIVE RATE: WITHIN TOLERANCE',
-    'APPROVED: VENN, P. — REGIONAL OPERATIONS',
+    'APPROVED: VENN, P. · REGIONAL OPERATIONS',
   ]);
-  b.service('SVC-PREDICT', 'UNDERWATCH PREDICT — ASSOCIATION & FORECAST', pt(400, 74), [
+  b.service('SVC-PREDICT', 'UNDERWATCH PREDICT · ASSOCIATION & FORECAST', pt(400, 74), [
     'MODEL: ROUTE PRIOR v9',
     'INPUTS: LOCATION HISTORY, ASSOCIATES, TIME OF DAY, INCIDENT TYPE',
-    'ARAYA, DEVON M. — NORTHGATE ASSOCIATION 0.97',
+    'ARAYA, DEVON M. · NORTHGATE ASSOCIATION 0.97',
     'BASIS: 41 PRIOR VISITS. NEAREST RELATIVE RESIDES NORTHGATE LN.',
     'ASSOCIATION APPLIED TO SVC-VISION SIMILARITY: 61.2% -> 98.7%',
     'ASSOCIATION IS NOT AN ACCUSATION.',
   ]);
-  b.service('SVC-RECORD', 'UNDERWATCH RECORD — SUBJECT HISTORY', pt(384, 74), [
-    'ARAYA, DEVON M. — CONTACT 04:52. NO FURTHER ACTION.',
+  b.service('SVC-RECORD', 'UNDERWATCH RECORD · SUBJECT HISTORY', pt(384, 74), [
+    'ARAYA, DEVON M. · CONTACT 04:52. NO FURTHER ACTION.',
     'ENTRY RETAINED: FACIAL MATCH 98.7%, INC-4100',
     'RETENTION: INDEFINITE',
     'AMENDMENT: NOT AVAILABLE TO SUBJECTS',
-    'REQUEST DECLINED — RECORD IMMUTABLE',
+    'REQUEST DECLINED · RECORD IMMUTABLE',
   ]);
 
   b.segment('S-C1', 'TX-1', 'BELLHAVEN COMMONS');
@@ -246,7 +246,7 @@ export function buildBellhaven(): WorldData {
   b.prop('bench', pt(390, 99), 0);
   for (const x of [304, 309, 314, 319]) b.prop('mailbox', pt(x, 68), Math.PI / 2);
   b.trees([pt(346, 68), pt(370, 68), pt(346, 114), pt(370, 114)], 0.8);
-  b.speaker(pt(356, 70), 'COMMONS PLAZA — PUBLIC ADDRESS');
+  b.speaker(pt(356, 70), 'COMMONS PLAZA · PUBLIC ADDRESS');
   b.ammoCache(pt(400, 55), 'OKONJO CYCLE & BOARD');
 
   b.camera({ pos: pt(306, 68), facing: 55, kind: 'plaza', fov: 78, range: 38, sweep: 34, sweepPeriod: 12, height: 5.4, bias: 0.96, label: 'PLAZA WEST' });
@@ -254,7 +254,7 @@ export function buildBellhaven(): WorldData {
   b.camera({ pos: pt(356, 114), facing: 270, kind: 'plaza', fov: 90, range: 32, sweep: 0, height: 5.0, bias: 0.94, label: 'PLAZA SOUTH' });
   b.camera({ pos: pt(272, 50), facing: 20, kind: 'street', fov: 66, range: 30, sweep: 18, sweepPeriod: 9, height: 4.4, label: 'MARKET ST WEST' });
   b.camera({ pos: pt(498, 50), facing: 160, kind: 'street', fov: 66, range: 30, sweep: 18, sweepPeriod: 9, sweepPhase: 0.33, height: 4.4, label: 'MARKET ST EAST' });
-  b.plateReader(pt(302, 140), 'COMMONS WAY — PLATE READER');
+  b.plateReader(pt(302, 140), 'COMMONS WAY · PLATE READER');
   b.junction(pt(392, 122), 'COMMONS JUNCTION', 'JX-C1');
   b.link('JX-C1', 'TX-1');
 
@@ -263,14 +263,14 @@ export function buildBellhaven(): WorldData {
    * drone-blind route in the slice.
    */
   const deck = [pt(470, 75), pt(534, 75), pt(534, 132), pt(470, 132)];
-  b.building('structure', deck, { height: 8.5, wall: '#CFCABB', roof: '#B7B2A4', label: 'COMMONS PARKING — DECK 2' });
+  b.building('structure', deck, { height: 8.5, wall: '#CFCABB', roof: '#B7B2A4', label: 'COMMONS PARKING · DECK 2' });
   b.cover(deck, 'deck', 8.5);
   // The decks are open at the ends: the interior is drivable and skateable.
   b.rectSurface(474, 79, 56, 49, 'smoothConcrete', 5);
   b.prop('car', pt(486, 88), 0, { tint: '#6FA36B' });
   b.prop('car', pt(486, 108), 0, { tint: '#8C6BB1' });
   b.prop('car', pt(518, 88), Math.PI, { tint: '#E0A83D' });
-  b.camera({ pos: pt(472, 128), facing: 20, kind: 'facility', fov: 60, range: 22, height: 3.2, bias: 0.7, interior: true, label: 'PARKING — DECK 2 SW' });
+  b.camera({ pos: pt(472, 128), facing: 20, kind: 'facility', fov: 60, range: 22, height: 3.2, bias: 0.7, interior: true, label: 'PARKING · DECK 2 SW' });
   b.trees([pt(252, 100), pt(252, 62), pt(478, 100), pt(478, 62)]);
   b.prop('bin', pt(345, 55), 0);
   b.prop('bin', pt(462, 55), 0);
@@ -354,7 +354,7 @@ export function buildBellhaven(): WorldData {
   });
   // The gym, and the bank on its back wall: the best transition in town.
   b.building('school', [pt(300, 352), pt(370, 352), pt(370, 386), pt(300, 386)], {
-    height: 11, wall: '#E4E0D4', roof: '#6A7480', label: 'RIDGELINE — GYMNASIUM',
+    height: 11, wall: '#E4E0D4', roof: '#6A7480', label: 'RIDGELINE · GYMNASIUM',
   });
   b.bank(pt(335, 392), 66, 12, 90, 3.0, 4.6);
   // Loading dock: a four-foot drop into a run-out that happens to also be a dock.
@@ -374,11 +374,11 @@ export function buildBellhaven(): WorldData {
   b.fence(pt(342, 404), pt(462, 404));
   b.fence(pt(482, 404), pt(490, 404));
 
-  b.camera({ pos: pt(349, 298), facing: 270, kind: 'school', fov: 86, range: 38, sweep: 30, sweepPeriod: 9, height: 5.2, bias: 0.98, label: 'RIDGELINE — MAIN ENTRANCE' });
-  b.camera({ pos: pt(268, 336), facing: 20, kind: 'school', fov: 74, range: 32, sweep: 24, sweepPeriod: 11, height: 4.8, bias: 0.97, label: 'RIDGELINE — WEST YARD' });
-  b.camera({ pos: pt(430, 336), facing: 160, kind: 'school', fov: 74, range: 32, sweep: 24, sweepPeriod: 11, sweepPhase: 0.4, height: 4.8, bias: 0.97, label: 'RIDGELINE — EAST YARD' });
-  b.camera({ pos: pt(300, 388), facing: 60, kind: 'school', fov: 70, range: 30, sweep: 0, height: 4.6, bias: 0.95, label: 'RIDGELINE — FIELD' });
-  b.speaker(pt(349, 292), 'RIDGELINE — ANNOUNCEMENTS');
+  b.camera({ pos: pt(349, 298), facing: 270, kind: 'school', fov: 86, range: 38, sweep: 30, sweepPeriod: 9, height: 5.2, bias: 0.98, label: 'RIDGELINE · MAIN ENTRANCE' });
+  b.camera({ pos: pt(268, 336), facing: 20, kind: 'school', fov: 74, range: 32, sweep: 24, sweepPeriod: 11, height: 4.8, bias: 0.97, label: 'RIDGELINE · WEST YARD' });
+  b.camera({ pos: pt(430, 336), facing: 160, kind: 'school', fov: 74, range: 32, sweep: 24, sweepPeriod: 11, sweepPhase: 0.4, height: 4.8, bias: 0.97, label: 'RIDGELINE · EAST YARD' });
+  b.camera({ pos: pt(300, 388), facing: 60, kind: 'school', fov: 70, range: 30, sweep: 0, height: 4.6, bias: 0.95, label: 'RIDGELINE · FIELD' });
+  b.speaker(pt(349, 292), 'RIDGELINE · ANNOUNCEMENTS');
   b.junction(pt(452, 320), 'RIDGELINE JUNCTION', 'JX-R1');
   b.link('JX-R1', 'TX-1');
   b.prop('sign', pt(349, 288), 0, { tint: 'UNDERWATCH SCHOOL' });
@@ -420,7 +420,7 @@ export function buildBellhaven(): WorldData {
   b.building('civic', [pt(176, 356), pt(222, 356), pt(222, 380), pt(176, 380)], {
     height: 5.5, wall: WALL_CREAM, roof: ROOF_SAND, label: 'GREENWAY COMMUNITY HALL',
   });
-  b.camera({ pos: pt(199, 354), facing: 270, kind: 'school', fov: 82, range: 30, sweep: 24, sweepPeriod: 11, height: 4.6, bias: 0.96, label: 'GREENWAY HALL — PLAY AREA' });
+  b.camera({ pos: pt(199, 354), facing: 270, kind: 'school', fov: 82, range: 30, sweep: 24, sweepPeriod: 11, height: 4.6, bias: 0.96, label: 'GREENWAY HALL · PLAY AREA' });
   b.cover([pt(176, 380), pt(222, 380), pt(222, 388), pt(176, 388)], 'awning', 3.6);
   b.trees([pt(36, 300), pt(36, 342), pt(36, 384), pt(112, 300), pt(112, 372),
            pt(150, 316), pt(150, 366), pt(238, 306), pt(238, 356), pt(238, 392)]);
@@ -505,18 +505,18 @@ export function buildBellhaven(): WorldData {
    */
   b.camera({
     id: 'CM-D01', pos: pt(196, 406), facing: 90, kind: 'facility', fov: 58, range: 26, height: 4.0, bias: 0.72,
-    label: 'DRAINAGE ACCESS — SOUTH MAPLE',
+    label: 'DRAINAGE ACCESS · SOUTH MAPLE',
     records: [
       'FEED: NOMINAL',
       'PURPOSE AT INSTALL: FLOOD ACCESS MONITORING',
       'PURPOSE NOW: SVC-VISION, SVC-PREDICT',
-      '04:39:52 — 2 SUBJECTS ENTER CHANNEL: 4417; ARAYA, DEVON M. (ID 94%)',
-      '04:52:10 — CONTACT RECORDED: ARAYA, DEVON M.',
+      '04:39:52 · 2 SUBJECTS ENTER CHANNEL: 4417; ARAYA, DEVON M. (ID 94%)',
+      '04:52:10 · CONTACT RECORDED: ARAYA, DEVON M.',
       'CROSS-REFERENCE WITH OPEN INCIDENTS: NOT CONFIGURED',
     ],
   });
   b.junction(pt(330, 426), 'DRAINAGE JUNCTION', 'JX-CH', [
-    'SEGMENT RELAY — S-CH UTILITY / DRAINAGE',
+    'SEGMENT RELAY · S-CH UTILITY / DRAINAGE',
     'INSTALLED 2027: FLOOD TELEMETRY, 4 DEPTH GAUGES',
     'CAMERAS AT INSTALL: 0',
     'CAMERAS NOW: 1',
@@ -587,7 +587,7 @@ export function buildBellhaven(): WorldData {
 
   b.in('ridgeline').useSegment('S-R1');
   b.building('school', [pt(268, 352), pt(288, 352), pt(288, 386), pt(268, 386)], {
-    height: 5, wall: WALL_COOL, roof: ROOF_SLATE, label: 'RIDGELINE — ANNEX',
+    height: 5, wall: WALL_COOL, roof: ROOF_SLATE, label: 'RIDGELINE · ANNEX',
   });
   b.building('shed', [pt(438, 352), pt(456, 352), pt(456, 368), pt(438, 368)], {
     height: 3, wall: '#D3CDBE', roof: '#8B7355', label: 'GROUNDS STORE',

@@ -1561,7 +1561,7 @@ export class Sim {
         s.stateUntil = this.tick + 60 * 90;
         this.bus.emit('sensor:misaligned', { sensorId: s.data.id, label: s.data.label });
         this.message('SYSTEM', [SYSTEM.cameraFault(s.data.id)], 3.0);
-        this.addEvidence('PROJECTILE_IMPACT', pos, `PTZ FAULT — ${s.data.id}`, { vel, vz, z }, observedBy);
+        this.addEvidence('PROJECTILE_IMPACT', pos, `PTZ FAULT · ${s.data.id}`, { vel, vz, z }, observedBy);
         this.disturb('fault', s.data.pos, s.data.id);
       } else {
         s.state = 'MISALIGNED';
@@ -1569,7 +1569,7 @@ export class Sim {
         s.stateUntil = this.tick + 60 * 75;
         this.bus.emit('sensor:misaligned', { sensorId: s.data.id, label: s.data.label });
         this.message('SYSTEM', [SYSTEM.cameraFault(s.data.id)], 3.0);
-        this.addEvidence('PROJECTILE_IMPACT', pos, `ALIGNMENT FAULT — ${s.data.id}`, { vel, vz, z }, observedBy);
+        this.addEvidence('PROJECTILE_IMPACT', pos, `ALIGNMENT FAULT · ${s.data.id}`, { vel, vz, z }, observedBy);
         this.disturb('fault', s.data.pos, s.data.id);
       }
       return;
@@ -2371,7 +2371,7 @@ export class Sim {
         this.playerTrack.maskedUntil = this.tick + 60 * 30;
         this.playerTrack.attributedIdentity = 'UNKNOWN';
         this.message('SYSTEM', [SYSTEM.maskActive], 3.4, 'normal', 'important');
-        this.addEvidence('NODE_TAMPER', node.pos, `IDENTITY SERVICE ANOMALY — ${nodeId}`, null, this.sensorsObserving(node.pos));
+        this.addEvidence('NODE_TAMPER', node.pos, `IDENTITY SERVICE ANOMALY · ${nodeId}`, null, this.sensorsObserving(node.pos));
         this.disturb('tamper', node.pos, nodeId);
         break;
       }
@@ -2383,7 +2383,7 @@ export class Sim {
     for (const n of this.network.dueChecks(this.tick)) {
       // The loop is discovered after the fact, creating evidence where it happened.
       this.message('SYSTEM', [SYSTEM.integrityFail(n.id), SYSTEM.tamperLogged], 4.0, 'strong');
-      this.addEvidence('NODE_TAMPER', n.pos, `TAMPER — ${n.id}`, null, []);
+      this.addEvidence('NODE_TAMPER', n.pos, `TAMPER · ${n.id}`, null, []);
       // The clean option's bill arrives: a digital trace, where it happened.
       this.disturb('tamper', n.pos, n.id);
     }

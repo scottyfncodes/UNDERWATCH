@@ -146,7 +146,7 @@ describe('the record that teaches what a segment is', () => {
   it('states a node count that is actually true', () => {
     const seg = data.network.segments.find((s) => s.id === 'S-N2')!;
     expect(recordsOf('JX-207')[0]).toBe(
-      `SEGMENT S-N2 — ${seg.nodeIds.length} NODES, ALL CARRIED BY THIS RELAY`);
+      `SEGMENT S-N2 · ${seg.nodeIds.length} NODES, ALL CARRIED BY THIS RELAY`);
   });
 
   it('is derived, so growing the district cannot make it a lie', () => {

@@ -1,0 +1,43 @@
+# UNDERWATCH
+
+Read `README.md` and the design record in `docs/` (start at `docs/00-README.md`;
+brand and interface rules are in `docs/11-brand-and-ui.md` and
+`docs/39-near-future-urban-noir.md`) before changing the game.
+
+Before pushing: `npm run typecheck && npm test && npx vite build`, and
+`npx playwright test` for the browser checks. After an intended design change,
+refresh the visual baselines with a commit message containing
+`[update baselines]` on a feature branch (never on the production branch).
+
+## Design guardrails
+
+Avoid generic AI-site patterns. Design should always be intentional. Always on purpose.
+
+### Icons & type
+- Don't default to Lucide for every icon. Use fewer icons, and pick or draw ones that fit the project.
+- No emojis in headings, cards, or button labels.
+- No sparkle/AI star icons anywhere.
+- Don't default to Inter, Geist, or Space Grotesk. Choose type that fits the project's personality.
+
+### Layout
+- No row of 3 identical feature cards with icon + title + one-liner.
+- No bento grids of mismatched stat tiles.
+- No fake terminal windows or "npx something init" snippets unless the product has a real CLI.
+- No placeholder product shots ("screenshot coming soon", gradient boxes in browser chrome). Use real screens or cut the section.
+
+### Color & effects
+- No default purple-on-black palette.
+- No liquid glass / frosted blur cards over gradient backgrounds.
+- No blurred radial gradient orbs as decoration.
+- No dot-grid background texture.
+- No rainbow-coded cards where each tile gets its own pastel. Color should mean something.
+
+### Motion
+- Arrows on buttons only where they mean "go somewhere," no animated arrow nudges.
+- Hover effects only on clickable things, and subtle. No lift-and-scale on every card.
+
+### Copy
+- No em dashes in UI copy.
+- No "It's not X, it's Y" lines.
+- No hype phrasing ("blazing fast", "fort-knox secure", "AI magic").
+- No made-up stats ("10x", "99.9%", "120+", "∞") unless they're real.

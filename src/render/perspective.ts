@@ -819,9 +819,9 @@ export class PerspectiveRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     let size = 46;
-    ctx.font = `${t.weight ?? 700} ${size}px Inter, system-ui, sans-serif`;
+    ctx.font = `${t.weight ?? 700} ${size}px "IBM Plex Sans", system-ui, sans-serif`;
     const m = ctx.measureText(t.str).width;
-    if (m > W * 0.9) { size *= (W * 0.9) / m; ctx.font = `${t.weight ?? 700} ${size}px Inter, system-ui, sans-serif`; }
+    if (m > W * 0.9) { size *= (W * 0.9) / m; ctx.font = `${t.weight ?? 700} ${size}px "IBM Plex Sans", system-ui, sans-serif`; }
     ctx.fillText(t.str, W / 2, H / 2 + 2);
     ctx.restore();
   }

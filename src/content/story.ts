@@ -242,7 +242,7 @@ export const BEATS: Beat[] = [
   },
   {
     id: 'devon-texts',
-    label: 'Devon — where are you',
+    label: 'Devon, where are you',
     // A friend who is waiting texts you. It says where he is the way a friend
     // would, by landmarks, and it says it once — and early, because the first
     // thing this afternoon should give the player is somewhere to go.
@@ -263,7 +263,7 @@ export const BEATS: Beat[] = [
   },
   {
     id: 'channel-arrival',
-    label: 'The Channel — no coverage',
+    label: 'The Channel: no coverage',
     when: (c) => dist(c.sim.player.pos, CHANNEL_ENTRY) < 34,
     run: (c) => {
       c.hud.say([DIALOGUE.devonOpening[2]], 4.0);
@@ -272,7 +272,7 @@ export const BEATS: Beat[] = [
 
   {
     id: 'devon-nudge',
-    label: 'Devon — you coming?',
+    label: 'Devon, you coming?',
     // A friend who suggested something and was ignored says so, once.
     when: (c, s) => s.metDevonAt > 0 && s.matchFiredAt < 0
       && c.sim.tick >= s.metDevonAt + 60 * 70 && dist(c.sim.player.pos, CHANNEL_ENTRY) > 60,
@@ -282,7 +282,7 @@ export const BEATS: Beat[] = [
   // ------------------------------------------------------------------ the hook
   {
     id: 'incident',
-    label: 'Incident reported — Northgate',
+    label: 'Incident reported: Northgate',
     /*
      * With Devon, or not at all. This used to need only the player at the
      * Channel, so a player who skated straight there without ever finding him
@@ -404,7 +404,7 @@ export const BEATS: Beat[] = [
     label: 'Find the camera that made the match',
     when: (c, s) => s.devonReleasedAt > 0 && c.sim.tick > s.devonReleasedAt - 60 * 40,
     run: (c) => {
-      c.sim.message('SYSTEM', ['INCIDENT INC-4100', 'SOURCE NODE: CM-207 — NORTHGATE'], 7.0);
+      c.sim.message('SYSTEM', ['INCIDENT INC-4100', 'SOURCE NODE: CM-207 · NORTHGATE'], 7.0);
       // No marker, no arrow. The system says where it is looking from, and the
       // player already knows what Northgate Lane looks like from the map.
       c.after(7, () => c.sim.message('CARE', [CARE.monthly], 5.5));
@@ -424,7 +424,7 @@ export const BEATS: Beat[] = [
    */
   {
     id: 'northgate-approach',
-    label: 'Northgate — the street is watched',
+    label: 'Northgate: the street is watched',
     when: (c, s) => s.devonReleasedAt > 0 && dist(c.sim.player.pos, { x: 145, y: 60 }) < 46,
     run: (c) => {
       c.sim.message('SYSTEM', [SYSTEM.subjectMonitoring], 4.5);
@@ -452,8 +452,8 @@ export const BEATS: Beat[] = [
       // was: sabotage stops a lens, not a file.
       const down = c.sim.sensorById.get('CM-207')?.state === 'OFFLINE';
       c.sim.message('SYSTEM', down
-        ? ['NODE CM-207 — FEED DOWN', 'RECORD RETAINED — NO CHANGE']
-        : ['NODE CM-207 — FEED NOMINAL', 'NO FAULT RECORDED'], 6.5);
+        ? ['NODE CM-207 · FEED DOWN', 'RECORD RETAINED · NO CHANGE']
+        : ['NODE CM-207 · FEED NOMINAL', 'NO FAULT RECORDED'], 6.5);
       c.after(4, () => c.sim.message('SYSTEM', [SYSTEM.queryAvailable, c.hint.inspect], 6.0));
     },
   },

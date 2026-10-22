@@ -92,10 +92,10 @@ export const LEVEL_CALL: Record<number, { text: string; tone: 'info' | 'warn' | 
   0: { text: 'HEAT OFF', tone: 'good' },
   1: { text: 'SOMEBODY CALLED IT IN', tone: 'info' },
   2: { text: 'OFFICER RESPONDING', tone: 'warn' },
-  3: { text: 'WANTED — RUN', tone: 'alarm' },
+  3: { text: 'WANTED. RUN', tone: 'alarm' },
   4: { text: 'PURSUIT', tone: 'alarm' },
   5: { text: 'LOCKDOWN', tone: 'alarm' },
 };
 
 export const MOM_RETURNS = 'MOM GAVE IT ALL BACK';
-export const YELPS = ['OW!', 'HEY!', 'OI!', 'WHAT THE—', 'OW! WHO DID THAT?'];
+export const YELPS = ['OW!', 'HEY!', 'OI!', 'WHAT THE...', 'OW! WHO DID THAT?'];

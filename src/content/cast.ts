@@ -65,7 +65,7 @@ export function authorCast(b: TownBuilder): void {
 
   // ------------------------------------------------------------------ channel
   b.in('channel');
-  b.sceneProp('sp-graffiti', 'graffiti', pt(240, 425.2), { rot: 90, w: 6, z: 1.25, tint: '#D45A7A', text: "SMILE — YOU'RE PREDICTED" });
+  b.sceneProp('sp-graffiti', 'graffiti', pt(240, 425.2), { rot: 90, w: 6, z: 1.25, tint: '#D45A7A', text: "SMILE · YOU'RE PREDICTED" });
   b.place('p-graffiti', pt(240, 428.4), 'Wall', { reach: 3.6, sceneProp: 'sp-graffiti' });
   // Under the footbridge, where everybody who has ever skated here has left a name.
   b.sceneProp('sp-ledge', 'graffiti', pt(180, 425.2), { rot: 90, w: 3.2, z: 0.8, tint: '#9AA5AC', text: 'K.M. · J+S · 4EVA' });

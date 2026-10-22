@@ -41,7 +41,7 @@ export const BARKS: Bark[] = [
   { id: 'b-burglary', phase: 'matched', lines: ['Did you get the alert? Northgate.', 'A burglary. In the afternoon. On Northgate Lane.'] },
   { id: 'b-kid', phase: 'matched', district: 'commons', lines: ["They're saying it was a kid from Ridgeline.", 'One of the skaters. It had his name and everything.'] },
   { id: 'b-photo', phase: 'matched', district: 'maple', lines: ["That's the Araya boy, isn't it. From the alert.", "He's always been polite to me."] },
-  { id: 'b-pa-alert', phase: 'matched', at: { x: 84, y: 97 }, lines: ['UNDERWATCH CARE: Northgate residents — a person of interest has been identified. Please remain aware.'] },
+  { id: 'b-pa-alert', phase: 'matched', at: { x: 84, y: 97 }, lines: ['UNDERWATCH CARE: Northgate residents, a person of interest has been identified. Please remain aware.'] },
 
   // ----------------------------------------------------------- released
   { id: 'b-carvalho', phase: 'released', district: 'northgate', lines: ["Ines is back from work. Says she never called anybody.", "Then who did?"] },

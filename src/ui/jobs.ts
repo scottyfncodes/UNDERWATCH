@@ -209,7 +209,7 @@ export class JobBoard {
           ${this.today ? `<div><dt>Conditions</dt><dd>${JOB.condition[this.today.condition.id].name}</dd></div>` : ''}
           ${r ? `<div><dt>Best</dt><dd><b class="g-${r.grade}">${r.grade}</b> ${num(r.total)} · ${fmtTime(r.time)} · seen ${pct(r.exposure)}${r.ghost ? ' · GHOST' : ''}</dd></div>` : ''}
         </dl>
-        <p class="brief-kind">${KIND_NOTE[j.kind]} ${j.kind === 'GHOST' ? 'Exposure counts double.' : 'Being seen never ends a job — it starts a chase.'}</p>
+        <p class="brief-kind">${KIND_NOTE[j.kind]} ${j.kind === 'GHOST' ? 'Exposure counts double.' : 'Being seen never ends a job. It starts a chase.'}</p>
         <div class="brief-actions">
           <button class="jb-go" data-act="go">GO${this.touch ? '' : ' <kbd>Enter</kbd>'}</button>
           <button class="jb-link" data-act="back">Back to the board</button>

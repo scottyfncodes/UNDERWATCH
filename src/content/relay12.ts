@@ -111,7 +111,7 @@ export function authorRelay12(b: TownBuilder): void {
 
   // ----------------------------------------------------------------- haulage
   b.building('structure', [pt(498, 250), pt(530, 250), pt(530, 280), pt(498, 280)], {
-    height: 8.0, wall: '#C9CEC8', roof: '#7E8A82', label: 'VENN HAULAGE — DEPOT',
+    height: 8.0, wall: '#C9CEC8', roof: '#7E8A82', label: 'VENN HAULAGE · DEPOT',
   });
   b.building('structure', [pt(493, 233), pt(501, 233), pt(501, 239), pt(493, 239)], {
     height: 2.8, wall: '#8C6E4E', roof: '#7B6044', label: 'CONTAINER 1',
@@ -145,7 +145,7 @@ export function authorRelay12(b: TownBuilder): void {
   // Seven of the eight hang on TX-2. The eighth is the argument.
   b.camera({
     id: 'CM-R01', pos: pt(479.6, 197), facing: 165, kind: 'facility',
-    fov: 86, range: 32, height: 4.4, bias: 0.9, label: 'RELAY 12 — WEST GATE',
+    fov: 86, range: 32, height: 4.4, bias: 0.9, label: 'RELAY 12 · WEST GATE',
     records: [
       'FEED: NOMINAL',
       'PURPOSE AT INSTALL: VEHICLE ACCESS CONTROL',
@@ -155,17 +155,17 @@ export function authorRelay12(b: TownBuilder): void {
   });
   b.camera({
     id: 'CM-R02', pos: pt(512, 174), facing: 270, kind: 'facility',
-    fov: 78, range: 26, height: 4.4, bias: 0.9, label: 'RELAY 12 — NORTH GATE',
+    fov: 78, range: 26, height: 4.4, bias: 0.9, label: 'RELAY 12 · NORTH GATE',
   });
   b.camera({
     id: 'CM-R08', pos: pt(548, 244), facing: 180, kind: 'facility',
-    fov: 60, range: 26, height: 4.4, bias: 0.88, label: 'RELAY 12 — EAST YARD',
+    fov: 60, range: 26, height: 4.4, bias: 0.88, label: 'RELAY 12 · EAST YARD',
   });
 
-  b.segment('S-X3', 'TX-2', 'RELAY 12 — YARD & HAULAGE');
+  b.segment('S-X3', 'TX-2', 'RELAY 12 · YARD & HAULAGE');
   b.camera({
     id: 'CM-R03', pos: pt(495.6, 208), facing: 135, kind: 'facility',
-    fov: 74, range: 24, height: 4.6, bias: 0.92, label: 'RELAY 12 — HALL DOOR',
+    fov: 74, range: 24, height: 4.6, bias: 0.92, label: 'RELAY 12 · HALL DOOR',
     records: [
       'FEED: NOMINAL',
       'PURPOSE: PLANT ROOM ACCESS',
@@ -177,7 +177,7 @@ export function authorRelay12(b: TownBuilder): void {
   b.camera({
     id: 'CM-R04', pos: pt(516, 249.6), facing: 270, kind: 'facility',
     fov: 80, range: 30, sweep: 24, sweepPeriod: 9, height: 5.0, bias: 0.9,
-    label: 'RELAY 12 — LOADING APRON',
+    label: 'RELAY 12 · LOADING APRON',
     records: [
       'FEED: NOMINAL',
       'INSTALLED BY: VENN HAULAGE LTD, 2029',
@@ -188,7 +188,7 @@ export function authorRelay12(b: TownBuilder): void {
   });
   b.camera({
     id: 'CM-R05', pos: pt(527.6, 289), facing: 180, kind: 'facility',
-    fov: 54, range: 24, height: 3.4, bias: 0.86, label: 'RELAY 12 — WEIGHBRIDGE',
+    fov: 54, range: 24, height: 3.4, bias: 0.86, label: 'RELAY 12 · WEIGHBRIDGE',
     records: [
       'FEED: NOMINAL',
       'SPECIFIED BY: TRADING STANDARDS, 2028',
@@ -199,10 +199,10 @@ export function authorRelay12(b: TownBuilder): void {
   });
   b.camera({
     id: 'CM-R06', pos: pt(496.5, 249), facing: 90, kind: 'facility',
-    fov: 64, range: 28, height: 4.2, bias: 0.88, label: 'RELAY 12 — LOCK-UP ROW',
+    fov: 64, range: 28, height: 4.2, bias: 0.88, label: 'RELAY 12 · LOCK-UP ROW',
   });
-  b.junction(pt(496.4, 254), 'RELAY 12 — HAULAGE SEGMENT RELAY', 'JX-R12', [
-    'SEGMENT RELAY — S-X3 YARD & HAULAGE',
+  b.junction(pt(496.4, 254), 'RELAY 12 · HAULAGE SEGMENT RELAY', 'JX-R12', [
+    'SEGMENT RELAY · S-X3 YARD & HAULAGE',
     'ORIGIN: PRIVATE SITE CCTV, VENN HAULAGE LTD',
     'ADOPTED 2031 UNDER UNDERWATCH CITY PARTNER SCHEME',
     'COST TO OPERATOR: NIL',
@@ -213,13 +213,13 @@ export function authorRelay12(b: TownBuilder): void {
 
   // The control case. Same fence, same morning, different uplink — and every
   // protection the street was never offered.
-  b.segment('S-X2', 'TX-1', 'RELAY 12 — OFFICE / ADMIN');
+  b.segment('S-X2', 'TX-1', 'RELAY 12 · OFFICE / ADMIN');
   b.camera({
     id: 'CM-R07', pos: pt(496, 192.5), facing: 90, kind: 'facility',
-    fov: 66, range: 20, height: 4.0, bias: 0.9, label: 'RELAY 12 — COMPOUND OFFICE',
+    fov: 66, range: 20, height: 4.0, bias: 0.9, label: 'RELAY 12 · COMPOUND OFFICE',
     records: [
       'FEED: NOMINAL',
-      'SEGMENT: S-X2 — OFFICE / ADMIN',
+      'SEGMENT: S-X2 · OFFICE / ADMIN',
       'CARRIED BY: TX-1, BELLHAVEN CENTRAL',
       'NOT CARRIED BY THE UPLINK ON THIS SITE',
       'BASIS: STAFF MONITORING IS A SEPARATE PURPOSE, POLICY 6.1',
@@ -231,11 +231,11 @@ export function authorRelay12(b: TownBuilder): void {
   // The site's own maintenance terminal, on the hall's east wall. Its record is
   // read out of the network as it stands today, because the number is the point.
   b.useSegment('S-X1');
-  b.junction(pt(531.4, 224), 'RELAY 12 — MAINTENANCE TERMINAL', 'MT-R12', (ctx) => {
+  b.junction(pt(531.4, 224), 'RELAY 12 · MAINTENANCE TERMINAL', 'MT-R12', (ctx) => {
     const provisioned = ctx.network.segments.filter((s) => s.uplinkId === 'TX-2').length;
     return [
-      'RELAY 12 — SITE MAINTENANCE TERMINAL',
-      'ASSET OWNER: BELLHAVEN COUNCIL — HIGHWAYS',
+      'RELAY 12 · SITE MAINTENANCE TERMINAL',
+      'ASSET OWNER: BELLHAVEN COUNCIL · HIGHWAYS',
       'COMMISSIONED 2029, CARRIAGEWAY RESURFACING BUDGET 14B',
       'ORIGINAL PURPOSE: WINTER GRITTING TELEMETRY',
       'SEGMENTS AT COMMISSIONING: 1',
@@ -256,8 +256,8 @@ export function authorRelay12(b: TownBuilder): void {
   // ---------------------------------------------------------------- dressing
   b.cover([pt(490, 232), pt(548, 232), pt(548, 248), pt(490, 248)], 'awning', 4.6);
   b.cover([pt(532, 262), pt(552, 262), pt(552, 300), pt(532, 300)], 'canopy', 4.0);
-  b.prop('sign', pt(480, 172), 0, { tint: 'UNDERWATCH CITY — RESTRICTED' });
-  b.prop('sign', pt(514, 170), 0, { tint: 'BELLHAVEN COUNCIL — HIGHWAYS DEPOT 12' });
+  b.prop('sign', pt(480, 172), 0, { tint: 'UNDERWATCH CITY · RESTRICTED' });
+  b.prop('sign', pt(514, 170), 0, { tint: 'BELLHAVEN COUNCIL · HIGHWAYS DEPOT 12' });
   b.prop('bin', pt(512, 194)); b.prop('bin', pt(533, 192));
   b.prop('cone', pt(506, 236)); b.prop('cone', pt(534, 236)); b.prop('cone', pt(541, 296));
   b.prop('hydrant', pt(506, 231));
@@ -282,7 +282,7 @@ export function authorRelay12(b: TownBuilder): void {
 export const TX2_RECORDS = uplinkRecords(
   'TX-2',
   [
-    'UNDERWATCH TRANSPORT — DISTRICT UPLINK TX-2',
+    'UNDERWATCH TRANSPORT · DISTRICT UPLINK TX-2',
     'SITE: RELAY 12, EAST BELLHAVEN',
     'FUNCTION: AGGREGATION AND CARRIAGE',
     'NO LOCAL STORAGE. NO LOCAL MATCHING. NO LOCAL DECISION.',

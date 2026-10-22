@@ -71,7 +71,7 @@ export function destabilise(d: Drone, rebootTicks: number): void {
   d.state = 'DESTABILISED';
   d.rebootTicks = rebootTicks;
   d.task = null;
-  d.reason = 'UNIT FAULT — DIAGNOSTIC';
+  d.reason = 'UNIT FAULT · DIAGNOSTIC';
 }
 
 export function assignTask(d: Drone, task: Task | null): void {

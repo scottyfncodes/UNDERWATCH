@@ -134,7 +134,7 @@ function mara(c: TalkContext): Conversation {
   if (!c.matched) {
     const lines = [
       "That deck's delaminating. Bring it in some time and I'll do the trucks for free.",
-      "Go on, the plaza's quiet this time of day. Mind the cameras on the cinema — they're new.",
+      "Go on, the plaza's quiet this time of day. Mind the cameras on the cinema. They're new.",
     ];
     return { lines: say(who, lines[c.times % lines.length]) };
   }
@@ -142,7 +142,7 @@ function mara(c: TalkContext): Conversation {
     return {
       lines: say(who,
         "I heard. Devon's mum rang me. I've known that boy since he was nine and couldn't ollie a crack.",
-        "You want to know how it decided? I watched them fit half those cameras. Everything Northgate sees goes out through a cabinet at Relay 12 — the haulage yard, far end of East Avenue.",
+        "You want to know how it decided? I watched them fit half those cameras. Everything Northgate sees goes out through a cabinet at Relay 12, the haulage yard, far end of East Avenue.",
         "And the camera that took the frame will tell you where the frame went. The app lets anyone read the box they're standing next to. They call that transparency.",
       ),
       learn: ['c-mara'],
@@ -168,8 +168,8 @@ function carvalho(c: TalkContext): Conversation {
   if (c.times === 0) {
     return {
       lines: say(who,
-        "Are you with the— no, you're a child. Sorry. There have been a lot of people.",
-        "I didn't report anything. I was at work. The app did it for me — 'on your behalf', it said.",
+        "Are you with the... no, you're a child. Sorry. There have been a lot of people.",
+        "I didn't report anything. I was at work. The app did it for me. 'On your behalf', it said.",
         "Nothing's gone. Except a parcel I've been waiting for all week, and that was never here to steal.",
       ),
       learn: ['c-resident'],
@@ -198,7 +198,7 @@ function brennan(c: TalkContext): Conversation {
   if (c.has('c-alert')) {
     return {
       lines: say(who, 'Back again?'),
-      choices: [{ id: 'alert', label: 'Did you see him — or the alert?' }, LEAVE],
+      choices: [{ id: 'alert', label: 'Did you see him, or the alert?' }, LEAVE],
     };
   }
   return { lines: say(who, "Kids these days. I said it to the officer and I'll say it to you: clear as day.") };
@@ -211,8 +211,8 @@ function courier(c: TalkContext): Conversation {
   return {
     lines: say(who,
       "Northgate? Yeah, I had one for fourteen earlier.",
-      "Doorbell told me it was a 'secure address' — no porch drops. So I picked it back up off the step and left it at sixteen.",
-      'Twenty to five, maybe? Hood up. It was spitting. Why — they complain?',
+      "Doorbell told me it was a 'secure address'. No porch drops. So I picked it back up off the step and left it at sixteen.",
+      'Twenty to five, maybe? Hood up. It was spitting. Why, they complain?',
     ),
     learn: ['c-courier'],
   };
@@ -228,7 +228,7 @@ function priya(c: TalkContext): Conversation {
   const lines: Line[] = [];
   if (c.times === 0) {
     lines.push(...say(who,
-      "Hi — Priya. Regional operations. I run these drop-ins because people deserve to be able to ask questions.",
+      "Hi, Priya. Regional operations. I run these drop-ins because people deserve to be able to ask questions.",
       "I can't discuss anyone's individual record. But I can tell you the system is working as designed.",
     ));
   }
@@ -284,7 +284,7 @@ export function chooseOption(
       return {
         conversation: {
           lines: say('Devon', "yeah?"),
-          choices: [{ id: 'drop-confirm', label: "Yeah. I'm letting it go." }, { id: 'not-yet', label: 'Actually — not yet.' }],
+          choices: [{ id: 'drop-confirm', label: "Yeah. I'm letting it go." }, { id: 'not-yet', label: 'Actually, not yet.' }],
         },
         effect: none,
       };
@@ -305,7 +305,7 @@ export function chooseOption(
       } else {
         lines.push(...say('Mara', "It's a lot of maybes, love. People will read it as you sticking up for your mate. Which you are."));
       }
-      if (c.misled) lines.push(...say('Mara', "And the neighbour who says he saw him — are you sure about that bit? Because that's the bit they'll check first."));
+      if (c.misled) lines.push(...say('Mara', "And the neighbour who says he saw him: are you sure about that bit? Because that's the bit they'll check first."));
       if (c.onRecord) lines.push(...say('Mara', "They've got you on file now, too. Somebody will bring that up."));
       lines.push(...say('Mara', 'I can put it in my window. Everybody walks past this shop. But once it is up, it is up.'));
       return {
@@ -327,8 +327,8 @@ export function chooseOption(
       if (c.strength >= CASE_HOLDS) {
         lines.push(...say('Priya Venn',
           '...',
-          "Where did you get the drainage log? No — don't tell me. It's ours. That's the point, isn't it.",
-          "This is a misattribution. I can't delete a record — nobody can, that's the design. But I can open a review, and a review goes on the record too.",
+          "Where did you get the drainage log? No, don't tell me. It's ours. That's the point, isn't it.",
+          "This is a misattribution. I can't delete a record. Nobody can, that's the design. But I can open a review, and a review goes on the record too.",
         ));
       } else {
         lines.push(...say('Priya Venn',
@@ -353,14 +353,14 @@ export function chooseOption(
 
   if (id === 'carvalho' && choice === 'parcel') {
     return {
-      conversation: { lines: say('Mrs. Carvalho', '...At sixteen?', "Oh, for— so the 'burglar' was the delivery. They had that poor boy's face on every phone in the street. Over a parcel.") },
+      conversation: { lines: say('Mrs. Carvalho', '...At sixteen?', "Oh, for... so the 'burglar' was the delivery. They had that poor boy's face on every phone in the street. Over a parcel.") },
       effect: { kind: 'told-carvalho' },
     };
   }
 
   if (id === 'brennan' && choice === 'alert') {
     return {
-      conversation: { lines: say('Mr. Brennan', "I— well. It came up on the phone. With his picture. And then I looked out, and...", 'There was someone. There was definitely someone.') },
+      conversation: { lines: say('Mr. Brennan', "I... well. It came up on the phone. With his picture. And then I looked out, and...", 'There was someone. There was definitely someone.') },
       effect: none,
     };
   }

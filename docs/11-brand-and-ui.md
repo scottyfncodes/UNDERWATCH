@@ -38,8 +38,8 @@ characters.
 
 ## 3. Typography
 
-Geometric humanist sans throughout (system stack: Inter / Söhne / Helvetica
-Neue). Two weights, generous letter-spacing on small caps, tabular figures for
+Humanist corporate sans throughout: IBM Plex Sans, beside the IBM Plex Mono
+the system's own readouts use (fallback: Helvetica Neue / system-ui). Two weights, generous letter-spacing on small caps, tabular figures for
 every number the system reports. Numbers are the brand's real typeface: `98.7%`,
 `PREDICTIVE RISK: 62%`, `NODE CM-114`.
 

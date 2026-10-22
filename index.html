@@ -21,7 +21,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
       /* Before a single script has run: the right colour, the name, and a
          line being drawn — so a slow connection looks like loading, and a
@@ -29,7 +29,7 @@
       html, body { margin: 0; height: 100%; background: #0B1016; }
       #boot {
         position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-        color: #E7EDF2; font: 300 12px/1 Inter, system-ui, sans-serif; z-index: 50;
+        color: #E7EDF2; font: 300 12px/1 "IBM Plex Sans", system-ui, sans-serif; z-index: 50;
         letter-spacing: 0.34em; text-transform: uppercase; transition: opacity 400ms ease;
       }
       #boot .name b { font-weight: 600; }
@@ -42,7 +42,7 @@
       #boot .place { color: rgba(231, 237, 242, 0.5); font-size: 10.5px; letter-spacing: 0.3em; }
       #boot .fail { display: none; max-width: 300px; text-align: center; text-transform: none; letter-spacing: 0.01em; font-size: 13px; line-height: 1.6; color: #C3CDD5; }
       #boot .fail button {
-        margin-top: 14px; font: 600 13px/1 Inter, system-ui, sans-serif; color: #10171F; background: #E7EDF2;
+        margin-top: 14px; font: 600 13px/1 "IBM Plex Sans", system-ui, sans-serif; color: #10171F; background: #E7EDF2;
         border: 0; border-radius: 999px; padding: 12px 22px; cursor: pointer;
       }
       #boot.failed .line, #boot.failed .place { display: none; }
@@ -80,7 +80,7 @@
     </script>
     <canvas id="game"></canvas>
     <div id="ui"></div>
-    <noscript><style>#boot .line, #boot .place { display: none; }</style><p style="position:fixed;inset:auto 0 30vh;text-align:center;color:#C3CDD5;font:13px/1.6 Inter,system-ui,sans-serif;z-index:60">UNDERWATCH needs JavaScript to run.</p></noscript>
+    <noscript><style>#boot .line, #boot .place { display: none; }</style><p style="position:fixed;inset:auto 0 30vh;text-align:center;color:#C3CDD5;font:13px/1.6 'IBM Plex Sans',system-ui,sans-serif;z-index:60">UNDERWATCH needs JavaScript to run.</p></noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

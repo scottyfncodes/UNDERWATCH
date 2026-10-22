@@ -50,7 +50,7 @@ export class EndingCard {
           <ul class="trail">${findings}</ul>
           <div class="end-count">${cf.clues.size} things noted · ${cf.deductions.size} connections made</div>
         </div>
-        <div class="end-seen"><span class="end-dots" aria-hidden="true">${dots}</span><span>Endings found: ${seen.length} of ${ENDING_ORDER.length}${others > 0 ? ' — the afternoon can end other ways.' : '.'}</span></div>
+        <div class="end-seen"><span class="end-dots" aria-hidden="true">${dots}</span><span>Endings found: ${seen.length} of ${ENDING_ORDER.length}${others > 0 ? '. The afternoon can end other ways.' : '.'}</span></div>
         <div class="end-actions">
           <button data-act="keep">Keep skating</button>
           <button data-act="new" class="primary">A new afternoon</button>
