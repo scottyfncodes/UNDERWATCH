@@ -31,6 +31,7 @@ import { dist, damp } from './core/math';
 import { Notebook } from './ui/notebook';
 import { Menu } from './ui/menu';
 import { EndingCard } from './ui/ending';
+import { PlaytestRecorder, PlaytestSheet, playtestEnabled } from './ui/playtest';
 import {
   clearAfternoon, loadAfternoon, loadEndingsSeen, recordEndingSeen, saveAfternoon, type SavedAfternoon,
 } from './core/save';
@@ -92,9 +93,11 @@ class Game {
   private notebook: Notebook;
   private menu: Menu;
   private ending: EndingCard;
+  /** Only in a `?playtest=1` build (docs/53): what the session did, and the tester's own answers. */
+  private playtest: { rec: PlaytestRecorder; sheet: PlaytestSheet } | null = null;
   /** Nothing in Bellhaven happens while the player is reading a menu. */
   private get paused(): boolean {
-    return this.notebook.open || this.menu.open || this.ending.open || this.board.open || this.results.open || this.busted.open;
+    return this.notebook.open || this.menu.open || this.ending.open || !!this.playtest?.sheet.open || this.board.open || this.results.open || this.busted.open;
   }
   /**
    * What is being played: the afternoon (the story), or jobs. The same town,
@@ -194,7 +197,17 @@ class Game {
     };
     this.notebook = new Notebook(document.body, this.sim, this.touchPrimary, () => this.resumeFromOverlay(),
       (made) => { if (!made) this.audio.hackTick(); });
+    if (playtestEnabled(location.search, (() => { try { return localStorage; } catch { return null; } })())) {
+      const rec = new PlaytestRecorder();
+      rec.bind(this.sim.bus);
+      const device = `${this.touchPrimary ? 'touch' : 'keyboard and mouse'} · ${window.innerWidth}x${window.innerHeight}`;
+      // The sheet can be opened over the ending; closing it goes back to
+      // whatever was showing, and only resumes the street if nothing was.
+      this.playtest = { rec, sheet: new PlaytestSheet(document.body, rec, device, () => { if (!this.ending.open) this.resumeFromOverlay(); }) };
+    }
+    const openPlaytest = this.playtest ? () => { this.clearHeldInput(); this.playtest!.sheet.show(); } : undefined;
     this.menu = new Menu(document.body, this.settings, this.touchPrimary, {
+      playtest: openPlaytest,
       resume: () => this.resumeFromOverlay(),
       notes: () => this.openNotebook(),
       newAfternoon: () => this.newAfternoon(),
@@ -228,6 +241,7 @@ class Game {
     this.ending = new EndingCard(document.body, this.sim, {
       keepSkating: () => this.resumeFromOverlay(),
       newAfternoon: () => this.newAfternoon(),
+      playtest: openPlaytest,
     });
 
     // Touch is another adapter, not a different game. Keyboard and mouse stay
@@ -918,6 +932,7 @@ class Game {
     this.clearTransientState();
     this.sim.disengage();
     this.hud.setVisible(false);
+    this.playtest?.rec.reprise();
     this.ad.play({
       reprise: true,
       onDone: () => {
@@ -925,6 +940,7 @@ class Game {
         this.hud.setVisible(true);
         if (ending) {
           this.persist();
+          this.playtest?.rec.ended(ending);
           this.ending.show(ending, recordEndingSeen(ending));
         }
       },
@@ -948,6 +964,7 @@ class Game {
         return;
       }
       if (this.phase !== 'play') return;
+      if (this.playtest?.sheet.key(e.code)) return;
       if (this.ending.open) return;
       if (this.busted.key(e.code) || this.board.key(e.code) || this.results.key(e.code)) { e.preventDefault(); return; }
       if (this.notebook.key(e.code) || this.menu.key(e.code)) { e.preventDefault(); return; }
@@ -1199,6 +1216,7 @@ class Game {
       this.sim.step(dt, emptyIntent(), null);
       return;
     }
+    this.playtest?.rec.sample(dt, this.sim.player.speed);
 
     // Aiming has its own vocabulary, so the engine is told which one is live.
     this.touch.setAiming(this.sim.aimMode);

@@ -12,9 +12,9 @@ export async function press(page: Page, info: TestInfo, selector: string): Promi
 }
 
 /** A fresh visitor on the title screen, with the fonts in. */
-export async function openTitle(page: Page): Promise<void> {
+export async function openTitle(page: Page, query = ''): Promise<void> {
   await page.clock.setFixedTime(FIXED_NOW);
-  await page.goto('./');
+  await page.goto(`./${query}`);
   await page.waitForSelector('#title-ride');
   await page.evaluate(() => document.fonts.ready);
   // The title's own entrance.
@@ -22,34 +22,42 @@ export async function openTitle(page: Page): Promise<void> {
 }
 
 /** Title → RIDE → the job board. */
-export async function openBoard(page: Page, info: TestInfo): Promise<void> {
-  await openTitle(page);
+export async function openBoard(page: Page, info: TestInfo, query = ''): Promise<void> {
+  await openTitle(page, query);
   await press(page, info, '#title-ride');
   await page.waitForSelector('#jobs-board:not(.hidden) .job-row');
   await page.waitForTimeout(500);
 }
 
 /** The board → the first job's brief. */
-export async function openBrief(page: Page, info: TestInfo): Promise<void> {
-  await openBoard(page, info);
+export async function openBrief(page: Page, info: TestInfo, query = ''): Promise<void> {
+  await openBoard(page, info, query);
   await press(page, info, '#jobs-board .job-row:not(.locked)');
   await page.waitForSelector('#jobs-board [data-act="go"]');
   await page.waitForTimeout(300);
 }
 
 /** The brief → GO: the first seconds of job 01. */
-export async function startRun(page: Page, info: TestInfo): Promise<void> {
-  await openBrief(page, info);
+export async function startRun(page: Page, info: TestInfo, query = ''): Promise<void> {
+  await openBrief(page, info, query);
   await press(page, info, '#jobs-board [data-act="go"]');
   await page.waitForSelector('#job-hud:not(.hidden)');
 }
 
 /** Mid-run → the pause menu. */
-export async function openPause(page: Page, info: TestInfo): Promise<void> {
-  await startRun(page, info);
+export async function openPause(page: Page, info: TestInfo, query = ''): Promise<void> {
+  await startRun(page, info, query);
   await page.waitForTimeout(600);
   if (isTouch(info)) await page.tap('#pause-corner .hud-button');
   else await page.keyboard.press('Escape');
   await page.waitForSelector('#menu:not(.hidden) .menu-card');
+  await page.waitForTimeout(400);
+}
+
+/** A playtest build (`?playtest=1`, docs/53): the pause menu → the tester's sheet. */
+export async function openPlaytest(page: Page, info: TestInfo): Promise<void> {
+  await openPause(page, info, '?playtest=1');
+  await press(page, info, '#menu [data-act="playtest"]');
+  await page.waitForSelector('#playtest:not(.hidden) .pt-card');
   await page.waitForTimeout(400);
 }
