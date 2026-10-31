@@ -7,7 +7,7 @@ to stay free of it is to become something it cannot predict.
 ```
 npm install
 npm run dev      # http://localhost:5173
-npm test         # 718 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
+npm test         # 728 tests: simulation, escalation, story, the case, determinism, architecture, touch, feel
 npm run build
 npm run test:e2e # browser checks: visual, accessibility (axe) and in-run layout
 ```
@@ -62,6 +62,16 @@ people of Bellhaven will tell you. You write it down, you put two things
 side by side in your notes to work something out, and then you decide who to
 show it to — Priya Venn at the UNDERWATCH drop-in, Mara's shop window, or
 nobody. Five endings are read off what you did and what you worked out.
+
+## Playtesting
+
+Add `?playtest=1` to the link to make that browser a playtest build (and
+`?playtest=0` to turn it off). The game records what it can see of the
+slice's six success criteria, and **Playtest report** in the pause menu and
+on the ending card asks the tester the rest and copies one block of text to
+send back. Nothing changes for anyone else. The plan from here to a finished
+game, and how to run a round, are in
+[`docs/53-the-road-to-ship.md`](docs/53-the-road-to-ship.md).
 
 ## Jobs
 

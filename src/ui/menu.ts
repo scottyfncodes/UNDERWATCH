@@ -17,6 +17,8 @@ export interface MenuActions {
   applySettings(): void;
   /** Set while a job is the thing being played: the foot offers the job's own way out. */
   jobs?: { active(): boolean; restart(): void; board(): void };
+  /** Only in a playtest build: the sheet the tester fills in and copies. */
+  playtest?: () => void;
 }
 
 export const KEYS: Array<[string, string]> = [
@@ -60,6 +62,7 @@ export class Menu {
       const act = (t.closest('[data-act]') as HTMLElement | null)?.dataset.act;
       if (act === 'resume') this.hide();
       else if (act === 'notes') { this.hide(false); this.actions.notes(); }
+      else if (act === 'playtest') { this.hide(false); this.actions.playtest?.(); }
       else if (act === 'restart-job') { this.hide(false); this.actions.jobs?.restart(); }
       else if (act === 'job-board') { this.hide(false); this.actions.jobs?.board(); }
       else if (act === 'new') {
@@ -167,6 +170,7 @@ export class Menu {
           </section>
         </div>
         <div class="menu-foot">
+          ${this.actions.playtest ? '<button data-act="playtest" class="quiet pt-open">Playtest report</button>' : ''}
           ${jobs ? `<button data-act="job-board" class="quiet">Job board</button>
                <button data-act="restart-job" class="quiet">Restart job${this.touch ? '' : ' <kbd>T</kbd>'}</button>` : this.confirmNew
             ? `<span class="confirm-note" role="alert">This forgets today. Start over?</span>

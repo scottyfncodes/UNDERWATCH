@@ -18,7 +18,7 @@ export class EndingCard {
   constructor(
     host: HTMLElement,
     private sim: Sim,
-    private actions: { keepSkating(): void; newAfternoon(): void },
+    private actions: { keepSkating(): void; newAfternoon(): void; playtest?: () => void },
   ) {
     this.el = document.createElement('div');
     this.el.id = 'ending';
@@ -28,6 +28,7 @@ export class EndingCard {
       const act = ((e.target as HTMLElement).closest('[data-act]') as HTMLElement | null)?.dataset.act;
       if (act === 'keep') { this.hide(); this.actions.keepSkating(); }
       if (act === 'new') this.actions.newAfternoon();
+      if (act === 'playtest') this.actions.playtest?.();
     });
   }
 
@@ -52,6 +53,7 @@ export class EndingCard {
         </div>
         <div class="end-seen"><span class="end-dots" aria-hidden="true">${dots}</span><span>Endings found: ${seen.length} of ${ENDING_ORDER.length}${others > 0 ? '. The afternoon can end other ways.' : '.'}</span></div>
         <div class="end-actions">
+          ${this.actions.playtest ? '<button data-act="playtest">Playtest report</button>' : ''}
           <button data-act="keep">Keep skating</button>
           <button data-act="new" class="primary">A new afternoon</button>
         </div>

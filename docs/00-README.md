@@ -57,6 +57,7 @@ before implementation and is the authority for what the game is trying to be.
 | 52 | [The Watch in the Street](52-the-watch-in-the-street.md) | The title's promise carried into play: known cameras' footprints on the ground, a bracket and lens line on the kid while a sensor really has them, the street rig answering landings and slams, a speed lens, the board's trail, a heated rail, the catch, the slam, a job point done, and controls with active and available states |
 | 51 | [Last Light](51-last-light.md) | A visual renovation: the inked town seen at last light (an evening sky, the ground falling to slate, street lamps and the Lot's floodlights), landing rings and rail sparks, a move plate, and a title, board and results that read as one instrument |
 | 50 | [The Top Band](50-the-top-band.md) | A phone layout pass: the job strip, the town's cards, the toasts and the plan's readout share the top of the glass by its measured edge, the title on a phone on its side gets the wide shot, and Playwright visual, axe and layout checks keep it |
+| 53 | [The Road to Ship](53-the-road-to-ship.md) | What finished means for this game, ten milestones from slice to sale, and the first: a `?playtest=1` build that records the slice's six success criteria and hands the tester a report to send back |
 
 ## The one-sentence pitch
 

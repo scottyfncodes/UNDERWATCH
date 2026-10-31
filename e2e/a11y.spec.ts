@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { openTitle, openBoard, openBrief, openPause } from './flow';
+import { openTitle, openBoard, openBrief, openPause, openPlaytest } from './flow';
 
 /*
  * axe-core against WCAG 2.2 A and AA on every screen a player reads before
@@ -27,3 +27,4 @@ test('title', async ({ page }) => { await openTitle(page); await scan(page); });
 test('job board', async ({ page }, info) => { await openBoard(page, info); await scan(page); });
 test('brief', async ({ page }, info) => { await openBrief(page, info); await scan(page); });
 test('pause menu', async ({ page }, info) => { await openPause(page, info); await scan(page); });
+test('playtest sheet', async ({ page }, info) => { await openPlaytest(page, info); await scan(page); });
